@@ -1,0 +1,30 @@
+{
+  "name": "discount",
+  "version": "0.0.0",
+  "description": "a discursive encounter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/C-F-K/discount.git"
+  },
+  "keywords": [
+    "chatroom",
+    "multiplayer"
+  ],
+  "author": "C-F-K",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/C-F-K/discount/issues"
+  },
+  "homepage": "https://github.com/C-F-K/discount",
+  "dependencies": {
+    "express": "^4.4.3",
+    "socket.io": "^1.0.6"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
