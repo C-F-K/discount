@@ -13,8 +13,9 @@ app.get('/', function(req, res){
 	res.sendfile('public/index.html');
 });
 
-// io.on('connection', function(socket){
-// 	console.log('a user connected');
+io.on('connection', function(socket){
+	console.log('a user connected');
+	console.log(socket.id);
 // 	socket.on('disconnect', function(){
 // 		console.log('user disconnected');
 // 	});
@@ -22,7 +23,7 @@ app.get('/', function(req, res){
 // 		console.log('message: ' + msg);
 // 		io.emit('chat message', msg);
 // 	});
-// });
+});
 
 var port = Number(process.env.PORT || 5000);
 
