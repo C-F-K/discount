@@ -1,8 +1,9 @@
 <!doctype html>
 <html>
   <head>
+    <meta charset="utf-8">
     <title>disCount - a discursive encounter</title>
-    <style>
+    <!-- <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
@@ -11,10 +12,27 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+    </style> -->
+    <link rel="stylesheet" href="styles.css">
+    <script src="../bower_components/platform/platform.js"></script>
+    <link rel="import" href="./elements/spoiler-alert.html">
+    <link rel="import" href="./elements/discount-room.html">
+    <script type="text/javascript" src="./vendor/firebase.js"></script>
+    <style>
+      :unresolved {
+        opacity: 0;
+      }
     </style>
   </head>
+  </head>
   <body>
-    <ul id="messages"></ul>
+    <h1>disCount</h1>
+    <h2>a discursive encounter</h2>
+    <br>
+    <!-- <spoiler-alert>Ned Stark dies</spoiler-alert> -->
+    <discount-room></discount-room>
+    
+    <!-- <ul id="messages"></ul>
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
@@ -30,6 +48,6 @@
       socket.on('chat message', function(msg){
         $('#messages').append($('<li>').text(msg));
       });
-    </script>
+    </script> -->
   </body>
 </html>
