@@ -1,0 +1,29 @@
+{
+  "name": "discount",
+  "main": "index.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/C-F-K/discount2",
+  "description": "a discursive encounter",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "chatroom",
+    "multiplayer"
+  ],
+  "authors": [
+    "C-F-K"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.3.3",
+    "firebase-element": "Polymer/firebase-element#~0.3.3"
+  }
+}

@@ -1,0 +1,558 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/firebase-element/firebase-element.html">
+<link rel="import" href="../../bower_components/firebase-element/firebase-import.html">
+
+<polymer-element name="discount-room">
+	<template>
+		<style type="text/css">
+			#userconfig {
+				display: block;
+			} 
+
+			label { 
+			    display: inline-block; 
+			    width: 8.75em; 
+			    text-align: right; 
+			}
+
+			.selected {
+				border: 1px solid white;
+			}
+
+			.singlecolor {
+				transition: opacity 1s;
+				-webkit-transition: opacity 1s;
+				-moz-transition: opacity 1s;
+				-o-transition: opacity 1s;
+				opacity: 0.9;
+				height: 24px;
+				width: 24px;
+				display: inline-block;
+				margin-right: 6px;
+			}
+			#submit {
+				display:inline-block;
+			}
+
+			#charblock {
+				display:inline-block;
+				width: 32em;
+				vertical-align: text-top;
+				padding-bottom:6px;
+			}
+
+			#colorblock {
+				display:inline-block;
+				width: 32em;
+				vertical-align: text-top;
+			}
+
+			#buttoncontainer {
+				display:inline-block;
+				margin-left: 9.2em;
+				margin-top: 0.5em;
+			}
+
+			table {
+			    font-size: 8pt;
+			    width:100%;
+			    height:100%;
+			    padding-left: auto;
+			    padding-right: auto;
+			}
+
+			td {
+			    width: 1.25%;
+			    height: 2.2em;
+			    text-align: center;
+			    vertical-align: bottom;	
+			}
+		</style>
+			<firebase-element 	id="firebase" 
+								location="https://discount-app.firebaseio.com/" 
+								data="{{data}}" 
+								keys="{{keys}}"
+								log
+								childEvents
+								on-data-change={{dataChange}}
+								on-child-added={{childAdded}}
+								on-child-changed={{childChanged}}
+								on-child-removed={{childRemoved}}>
+			</firebase-element>
+			<div id="userconfig">
+				<label>Name:</label> 
+				<input id="uname" type="text"></input><br>
+				<label>Character:</label>
+				<div id="charblock">
+					<template repeat="{{ char in characters }}">
+						<span id="{{char.name}}" class="possiblechar" on-click={{clickChar}}>{{char.chr}}</span>
+					</template>
+				</div><br>
+				<label>Color:</label>
+				<div id="colorblock">
+					<template repeat="{{ color in palette }}">
+						<div class="singlecolor" id="{{color}}" on-click={{fadeOthers}}></div>
+					</template>
+				</div>
+				<br>
+				<div id="buttoncontainer">
+					<button id="submit" on-click={{sendChar}}>Submit</button>
+				</div>
+			</div>
+			<hr>
+			<table> 
+	        	<template repeat="{{ file in files }}">
+	        	    <tr>
+	        	        <template repeat="{{ rank in ranks }}">
+	        	            <td id="{{file}}{{rank}}">{{ space }}</td>
+	        	        </template>
+	    	        </tr>
+	    	    </template>
+		    </table>
+	</template>
+	<script>
+		Polymer('discount-room', {
+			readyFlag: 0,
+			debug: 0,
+			observe: {
+			},
+			characters: [
+				{name:"a", chr:"a"}, 
+				{name:"b", chr:"b"}, 
+				{name:"c", chr:"c"}, 
+				{name:"d", chr:"d"}, 
+				{name:"e", chr:"e"}, 
+				{name:"f", chr:"f"}, 
+				{name:"g", chr:"g"}, 
+				{name:"h", chr:"h"}, 
+				{name:"i", chr:"i"}, 
+				{name:"j", chr:"j"}, 
+				{name:"k", chr:"k"}, 
+				{name:"l", chr:"l"}, 
+				{name:"m", chr:"m"}, 
+				{name:"n", chr:"n"}, 
+				{name:"o", chr:"o"}, 
+				{name:"p", chr:"p"}, 
+				{name:"q", chr:"q"}, 
+				{name:"r", chr:"r"}, 
+				{name:"s", chr:"s"}, 
+				{name:"t", chr:"t"}, 
+				{name:"u", chr:"u"}, 
+				{name:"v", chr:"v"}, 
+				{name:"w", chr:"w"}, 
+				{name:"x", chr:"x"}, 
+				{name:"y", chr:"y"}, 
+				{name:"z", chr:"z"}, 
+				{name:"A", chr:"A"}, 
+				{name:"B", chr:"B"}, 
+				{name:"C", chr:"C"}, 
+				{name:"D", chr:"D"}, 
+				{name:"E", chr:"E"}, 
+				{name:"F", chr:"F"}, 
+				{name:"G", chr:"G"}, 
+				{name:"H", chr:"H"}, 
+				{name:"I", chr:"I"}, 
+				{name:"J", chr:"J"}, 
+				{name:"K", chr:"K"}, 
+				{name:"L", chr:"L"}, 
+				{name:"M", chr:"M"}, 
+				{name:"N", chr:"N"}, 
+				{name:"O", chr:"O"}, 
+				{name:"P", chr:"P"}, 
+				{name:"Q", chr:"Q"}, 
+				{name:"R", chr:"R"}, 
+				{name:"S", chr:"S"}, 
+				{name:"T", chr:"T"}, 
+				{name:"U", chr:"U"}, 
+				{name:"V", chr:"V"}, 
+				{name:"W", chr:"W"}, 
+				{name:"X", chr:"X"}, 
+				{name:"Y", chr:"Y"}, 
+				{name:"Z", chr:"Z"}, 
+				{name:"zero", chr:"0"}, 
+				{name:"one", chr:"1"}, 
+				{name:"two", chr:"2"}, 
+				{name:"three", chr:"3"}, 
+				{name:"four", chr:"4"}, 
+				{name:"five", chr:"5"}, 
+				{name:"six", chr:"6"}, 
+				{name:"seven", chr:"7"}, 
+				{name:"eight", chr:"8"}, 
+				{name:"nine", chr:"9"}, 
+				{name:"colon", chr:":"},
+				{name:"doublequote", chr: "\""}, 
+				{name:"hash", chr: "#"}, 
+				{name:"percent", chr:"%"}, 
+				{name:"ampersand", chr: "&"}, 
+				{name:"singlequote", chr:"\'"}, 
+				{name:"openbracket", chr:"("}, 
+				{name:"closebracket", chr:")"}, 
+				{name:"asterisk", chr:"*"}, 
+				{name:"plus", chr:"+"}, 
+				{name:"comma", chr:","}, 
+				{name:"hyphen", chr:"-"}, 
+				{name:"period", chr:"."}, 
+				{name:"slash", chr:"/"}, 
+				{name:"semicolon", chr:";"}, 
+				{name:"openanglebracket", chr:"<"}, 
+				{name:"equals", chr:"="}, 
+				{name:"closeanglebracket", chr:">"}, 
+				{name:"question", chr:"?"}, 
+				{name:"at", chr:"@"}, 
+				{name:"opensquarebracket", chr:"["}, 
+				{name:"backslash", chr:"\\"}, 
+				{name:"closesquarebracket", chr:"]"}, 
+				{name:"caret", chr:"^"}, 
+				{name:"underscore", chr:"_"}, 
+				{name:"accent", chr:"`"}, 
+				{name:"opencurlybrace", chr:"{"}, 
+				{name:"pipe", chr:"|"}, 
+				{name:"closecurlybrace", chr:"}"}, 
+				{name:"tilde", chr:"~"}
+			],
+			palette: [
+				"red", 
+				"yellow", 
+				"green", 
+				"blue", 
+				"cyan", 
+				"purple", 
+				"brown", 
+				"fuchsia", 
+				"greenyellow", 
+				"orange", 
+				"white", 
+				"gray"
+			],
+			selectedChar: "",
+			selectedColor: "",
+			ranks: [],
+			files: [
+				"a",
+				"b",
+				"c",
+				"d",
+				"e",
+				"f",
+				"g",
+				"h",
+				"i",
+				"j",
+				"k",
+				"l",
+				"m",
+				"n",
+				"o",
+				"p",
+				"q",
+				"r",
+				"s",
+				"t",
+				"u",
+				"v",
+				"w",
+				"x"
+			],
+			newfileup: 0,
+			newfiledown: 0,
+			newrankleft: 0,
+			newrankright: 0,
+			user: "",
+			occupied: [],
+			space: " ",
+			lastknownkeys: [],
+
+			ready: function (){
+				if (this.debug) {console.log('debug mode is set'); 
+				console.log(this.data + ":" + this.keys);}
+				for (i = 0; i < 80; i++) {
+					this.ranks.push(i);
+				}
+				this.styleColorDivs();
+				var boundOnKeyUp = this.onKeyUp.bind(this);
+				var boundUserLeaves = this.userLeaves.bind(this);
+				window.addEventListener("keyup", boundOnKeyUp, false);
+				window.addEventListener("unload", boundUserLeaves, false);
+				setInterval(this.screenScrub(), 3000);
+				this.readyFlag = 1;
+			},
+			// currently: only the first user to join a space is moved
+			// doesn't correctly trigger the unload event when deployed
+
+			userLeaves: function() {
+				this.$.firebase.remove(this.user);
+			},
+
+			screenScrub: function() {
+				if (this.readyFlag) {
+					for (var i = 0; i < this.files.length; i++) {
+						for (var j = 0; j < this.ranks.length; j++) {
+							var scrub = this.files[i] + this.ranks[j];
+							if (this.occupied.indexOf(scrub) === -1) {
+								this.shadowRoot.getElementById(scrub).innerHTML = this.space;
+							}
+						}
+					}
+				}
+			},
+
+			styleColorDivs: function(){
+				var queryRoot = this.shadowRoot;
+				if (this.debug) { console.log('function styleColorDivs:' + queryRoot); }
+				var resource = this.palette;
+				if (this.debug) { console.log('function styleColorDivs:' + resource); }
+				for (var h = 0; h < this.palette.length; h++) {
+					queryRoot.getElementById(resource[h]).style.background=resource[h];
+					queryRoot.getElementById(resource[h]).style.opacity=0.9;
+					if (this.debug) { console.log('function styleColorDivs:' + queryRoot.getElementById(resource[h])); }
+				} 
+			},
+
+			onKeyUp: function (evt) {
+				if (this.debug) { console.log("function onKeyUp: context:");
+				console.log(this); }
+				if (evt = evt ? evt : window.event ? event : null) {
+					if (this.debug) { console.log(evt.keyCode);
+					console.log("function onKeyUp: this inside:");
+					console.log(this); }
+					if (this[evt.keyCode]) {
+						this[evt.keyCode]();
+					}
+				}
+			},
+
+			'37': function(){
+				if (this.debug) { console.log("keyhandler: left");
+				console.log("file: " + this.data[this.user].file);
+				console.log("rank: " + this.data[this.user].rank);
+				console.log("rank after moving: " + this.newrankleft); }
+				if (this.data[this.user].rank === 0) {
+					return false;
+				}
+				var oldplace = this.data[this.user].file + this.data[this.user].rank;
+				this.data[this.user].lastknownplace = oldplace;
+				var newplace = this.data[this.user].file + this.newrankleft;
+				if (this.noCollision(newplace)) {
+					this.data[this.user].rank = this.newrankleft;
+					this.$.firebase.commitProperty(this.user); 
+				}
+			},
+			'38': function(){
+				if (this.debug) { console.log("keyhandler: up");
+				console.log("file: " + this.data[this.user].file);
+				console.log("rank: " + this.data[this.user].rank);
+				console.log("file index after moving: " + this.newfileup);
+				console.log("file after moving: " + this.files[this.newfileup]); }
+				if (this.data[this.user].file === 'a') {
+					return false;
+				}
+				var oldplace = this.data[this.user].file + this.data[this.user].rank;
+				this.data[this.user].lastknownplace = oldplace;
+				var newplace = this.newfileup + this.data[this.user].rank;
+				if (this.noCollision(newplace)) {
+					this.data[this.user].file = this.files[this.newfileup];
+					this.$.firebase.commitProperty(this.user);
+				}
+			},
+			'39': function(){
+				if (this.debug) { console.log("keyhandler: right");
+				console.log("file: " + this.data[this.user].file);
+				console.log("rank: " + this.data[this.user].rank);
+				console.log("rank after moving: " + this.newrankright); }
+				if (this.data[this.user].rank === 79) {
+					return false;
+				}
+				var oldplace = this.data[this.user].file + this.data[this.user].rank;
+				this.data[this.user].lastknownplace = oldplace;
+				var newplace = this.data[this.user].file + this.newrankright;
+				if (this.noCollision(newplace)) {
+					this.data[this.user].rank = this.newrankright;
+					this.$.firebase.commitProperty(this.user);
+				}
+			},
+			'40': function(){
+				if (this.debug) { console.log("keyhandler: down");
+				console.log("file: " + this.data[this.user].file);
+				console.log("rank: " + this.data[this.user].rank);
+				console.log("file index after moving: " + this.newfiledown);
+				console.log("file after moving: " + this.files[this.newfiledown]); }
+				if (this.data[this.user].file === 'x') {
+					return false;
+				}
+				var oldplace = this.data[this.user].file + this.data[this.user].rank;
+				this.data[this.user].lastknownplace = oldplace;
+				var newplace = this.newfiledown + this.data[this.user].rank;
+				if (this.noCollision(newplace)) {
+					this.data[this.user].file = this.files[this.newfiledown];
+					this.$.firebase.commitProperty(this.user);
+				}
+			},
+			'68': function(){
+				if (this.debug) {
+					this.debug = 0;
+					console.log('debug mode off');
+				} else {
+					this.debug = 1;
+					console.log('debug mode on');
+				}
+			},
+
+			noCollision: function(newplace) {
+				if (this.occupied.indexOf(newplace) === -1) {
+					return true;
+				} else {
+					return false;
+				}
+			},
+
+			// when extending to multiplayer roguelike: 
+			//		add function here to do combat
+			//		called from keyhandler when noCollision returns false.
+			
+			clickChar: function(el) {
+				if (this.debug) { console.log("function clickChar: " + el.toElement.id);
+				console.log (el.toElement.className); }
+				if (el.toElement.className == "possiblechar selected") {
+					return false;
+				} else {
+					var clickedId = "#" + el.toElement.id;
+					var queried = this.shadowRoot;
+					var resource = this.characters;
+					var preselect = "";
+					if (this.debug) { console.log("function clickChar: " + this.shadowRoot.querySelector(clickedId).className);
+					console.log(this.shadowRoot.querySelectorAll(".possiblechar").array());
+					console.log(this.characters); }
+					for (var i = 0; i < resource.length; i++) {
+						if (this.debug) { console.log("function clickChar: " + queried.querySelector(".possiblechar")); }
+						var itr = "#" + resource[i].name;
+						if (this.debug) { console.log("function clickChar: " + itr); }
+						queried.querySelector(itr).className = "possiblechar";
+					}
+					var clicked = this.shadowRoot.querySelector(clickedId);
+					clicked.className = clicked.className + " selected";
+					var slicedId = clickedId.substring(1);
+					for (var j = 0; j < resource.length; j++) {
+						if (resource[j].name == slicedId) {
+							preselect = resource[j].chr;
+						}
+					}
+					this.selectedChar = preselect;
+					if (this.debug) { console.log("function clickChar: " + this.selectedChar);
+					console.log(this.shadowRoot.querySelector(clickedId).className); }
+				}
+			},
+
+			fadeOthers: function(e){
+				if (this.debug) { console.log("function fadeOthers: " + e.toElement.id); }
+				var resource = this.palette;
+				if (this.debug) { console.log("function fadeOthers: " + resource); }
+				for (var k = 0; k < this.palette.length; k++){
+					this.shadowRoot.getElementById(this.palette[k]).style.opacity=0.3;
+				}
+				this.shadowRoot.getElementById(e.toElement.id).style.opacity=1;
+				this.selectedColor = e.toElement.id;
+				if (this.debug) { console.log("function fadeOthers: " + this.selectedColor); }
+			},
+
+			randomPlace: function() {
+				var file = this.files[Math.floor(Math.random() * (this.files.length - 1))];
+				var rank = Math.floor(Math.random()*(this.ranks.length -1));
+				var place = file + rank;
+				if (this.occupied.indexOf(place) === -1) {
+					return place;
+				} else {
+					this.randomPlace();
+				}
+			},
+
+			sendChar: function(){
+				var unm = this.$.uname.value;
+				var uchr = this.selectedChar;
+				var uclr = this.selectedColor; 
+				if (uchr == "" || unm == "" || uclr == "") {
+					alert("Need a name, character and color");
+					return false;
+				} else {
+					this.lastknownkeys = this.keys;
+					if (this.debug) { console.log("function sendChar: " + this.lastknownkeys); }
+					var startplace = this.randomPlace();
+					var startfile = startplace.substring(0,1);
+					var startrank = startplace.substring(1);
+					this.$.firebase.push({
+						rank: startrank,
+						file: startfile,
+						chr: uchr,
+						clr: uclr,
+						name: unm,
+						lastknownplace: ""
+					});
+				}
+				this.shadowRoot.querySelector("#userconfig").style.display="none";
+			},
+
+			dataChange: function() {
+				if (this.user == "") {
+					console.log("you are not yet in the room");
+				} else {
+					if (this.data[this.user]) {
+						var place = this.data[this.user].file + this.data[this.user].rank;
+						console.log("your position is " + place);
+						var filenum = this.files.indexOf(this.data[this.user].file)
+						this.newfiledown = filenum;
+						this.newfiledown++;
+						this.newfileup = filenum;
+						this.newfileup--;
+						this.newrankleft = this.data[this.user].rank;
+						this.newrankleft--;
+						this.newrankright = this.data[this.user].rank;
+						this.newrankright++;
+					}
+				}
+			},
+
+			childAdded: function(e){
+				if (this.user == "") {
+					this.user = e.detail.name;
+					console.log('you have been assigned uID ' + this.user);
+				}
+				var place = '#' + e.detail.value.file + e.detail.value.rank;
+				var child = this.shadowRoot.querySelector(place);
+				child.innerHTML = e.detail.value.chr;
+				child.style.color=e.detail.value.clr;
+				this.occupied.push(place.substring(1));
+				console.log("user " + e.detail.value.name + " has entered the room at " + place.substring(1));
+				var strungUID = "data." + e.detail.name;
+				this.observe[strungUID] = 'dataChange';
+			},
+
+			childChanged: function(e) {
+				if (this.debug) { console.log("function childChanged: " + e); }
+				var chr = e.detail.value.chr;
+				var clr = e.detail.value.clr;
+				var oldplace = e.detail.value.lastknownplace;
+				this.occupied.splice(this.occupied.indexOf(oldplace), 1);
+				var newplace = e.detail.value.file + e.detail.value.rank;
+				this.occupied.push(newplace);
+				this.displayUpdate(oldplace,newplace,chr,clr);
+			},
+
+			childRemoved: function(e) {
+				if (this.debug) { console.log("function childRemoved: " + e); }
+				var place = e.detail.value.file + e.detail.value.rank;
+				this.occupied.splice(this.occupied.indexOf(place), 1);
+				this.shadowRoot.getElementById(place).innerHTML = this.space;
+				var unStrungUID = "data." + e.detail.name;
+				this.observe.splice(this.observe.indexOf(unStrungUID), 1);
+				console.log("user " + e.detail.value.name + " has left the room");
+			},
+
+			displayUpdate: function(oldplace, newplace, chr, clr) {
+				if (this.debug) { console.log("function displayUpdate: old place: " + this.shadowRoot.getElementById(oldplace).innerHTML); }
+				this.shadowRoot.getElementById(oldplace).innerHTML = this.space;
+				if (this.debug) { console.log("function displayUpdate: new place: " + this.shadowRoot.getElementById(newplace).innerHTML); }
+				this.shadowRoot.getElementById(newplace).innerHTML = chr;
+				this.shadowRoot.getElementById(newplace).style.color = clr;
+			}
+		});		
+	</script>
+</polymer-element>
