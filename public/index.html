@@ -20,14 +20,20 @@
     <h2>a discursive encounter</h2>
     <br>
     <!-- <spoiler-alert>Ned Stark dies</spoiler-alert> -->
-    <discount-room></discount-room>
+    <discount-room id="room"></discount-room>
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      var socket = io();
+      document.addEventListener('polymer-ready', function(){
+        var socket = io();
+        var room = document.querySelector('#room');
+        socket.on('uuid', function(e){
+          room.user = e.uuid;
+        });
+      });
     </script>
     <!-- <ul id="messages"></ul>
-    <form action="">
+    <form action=""> 
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
     

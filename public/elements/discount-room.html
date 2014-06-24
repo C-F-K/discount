@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/firebase-element/firebase-element.html">
 <link rel="import" href="../../bower_components/firebase-element/firebase-import.html">
 
+
 <polymer-element name="discount-room">
 	<template>
 		<style type="text/css">
@@ -68,7 +69,7 @@
 			    vertical-align: bottom;	
 			}
 		</style>
-			<firebase-element 	id="firebase" 
+			<!-- <firebase-element 	id="firebase" 
 								location="https://discount-app.firebaseio.com/" 
 								data="{{data}}" 
 								keys="{{keys}}"
@@ -78,7 +79,7 @@
 								on-child-added={{childAdded}}
 								on-child-changed={{childChanged}}
 								on-child-removed={{childRemoved}}>
-			</firebase-element>
+			</firebase-element> -->
 			<div id="userconfig">
 				<label>Name:</label> 
 				<input id="uname" type="text"></input><br>
@@ -110,8 +111,14 @@
 	    	    </template>
 		    </table>
 	</template>
+	<script src="/socket.io/socket.io.js"></script>
 	<script>
+		var socket = io();
+
 		Polymer('discount-room', {
+			publish: {
+				user: null
+			},
 			readyFlag: 0,
 			debug: 0,
 			observe: {
@@ -257,10 +264,13 @@
 			newfiledown: 0,
 			newrankleft: 0,
 			newrankright: 0,
-			user: "",
 			occupied: [],
 			space: " ",
 			lastknownkeys: [],
+
+			userChanged: function(){
+				console.log(this.user);
+			},
 
 			ready: function (){
 				if (this.debug) {console.log('debug mode is set'); 
@@ -270,17 +280,16 @@
 				}
 				this.styleColorDivs();
 				var boundOnKeyUp = this.onKeyUp.bind(this);
-				var boundUserLeaves = this.userLeaves.bind(this);
 				window.addEventListener("keyup", boundOnKeyUp, false);
-				window.addEventListener("unload", boundUserLeaves, false);
 				setInterval(this.screenScrub(), 3000);
+				// var place = '';
+				// var child = this.shadowRoot.querySelector;
+				// socket.on('newCharAdded', function(e){
+				// 	place = '#' + e.file + e.rank;
+				// 	child(place).innerHTML = e.chr;
+				// 	child(place).style.color = e.clr;
+				// });
 				this.readyFlag = 1;
-			},
-			// currently: only the first user to join a space is moved
-			// doesn't correctly trigger the unload event when deployed
-
-			userLeaves: function() {
-				this.$.firebase.remove(this.user);
 			},
 
 			screenScrub: function() {
@@ -466,6 +475,7 @@
 			},
 
 			sendChar: function(){
+				// evt.preventDefault();
 				var unm = this.$.uname.value;
 				var uchr = this.selectedChar;
 				var uclr = this.selectedColor; 
@@ -473,19 +483,20 @@
 					alert("Need a name, character and color");
 					return false;
 				} else {
-					this.lastknownkeys = this.keys;
-					if (this.debug) { console.log("function sendChar: " + this.lastknownkeys); }
+					// this.lastknownkeys = this.keys;
+					// if (this.debug) { console.log("function sendChar: " + this.lastknownkeys); }
 					var startplace = this.randomPlace();
 					var startfile = startplace.substring(0,1);
 					var startrank = startplace.substring(1);
-					this.$.firebase.push({
+					this.userState = {
 						rank: startrank,
 						file: startfile,
 						chr: uchr,
 						clr: uclr,
 						name: unm,
 						lastknownplace: ""
-					});
+					};
+					socket.emit('newChar', this.userState);
 				}
 				this.shadowRoot.querySelector("#userconfig").style.display="none";
 			},
@@ -511,18 +522,16 @@
 			},
 
 			childAdded: function(e){
-				if (this.user == "") {
-					this.user = e.detail.name;
-					console.log('you have been assigned uID ' + this.user);
-				}
-				var place = '#' + e.detail.value.file + e.detail.value.rank;
+				// if (this.user == "") {
+				// 	this.user = e.detail.name;
+				// 	console.log('you have been assigned uID ' + this.user);
+				// } no longer need this shit because uuid is always assigned on connect
+				var place = '#' + e.file + e.rank;
 				var child = this.shadowRoot.querySelector(place);
-				child.innerHTML = e.detail.value.chr;
-				child.style.color=e.detail.value.clr;
+				child.innerHTML = e.chr;
+				child.style.color=e.clr;
 				this.occupied.push(place.substring(1));
 				console.log("user " + e.detail.value.name + " has entered the room at " + place.substring(1));
-				var strungUID = "data." + e.detail.name;
-				this.observe[strungUID] = 'dataChange';
 			},
 
 			childChanged: function(e) {
