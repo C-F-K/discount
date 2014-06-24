@@ -14,33 +14,28 @@ app.get('/', function(req, res){
 });
 
 var population = new Object();
+var occupiedSpaces = new Object();
 
-io.on('connection', function(socket){
+io.sockets.on('connection', function(socket){
 	console.log('a user connected');
 	var userId = socket.id;
 	var newUser = { 'uuid' : userId };
 	socket.emit('uuid', newUser);
 	population[userId] = new Object();
 	console.log(population);
-	// console.log(socket.id);
-// 	socket.on('disconnect', function(){
-// 		console.log('user disconnected');
-// 	});
-// 	socket.on('chat message', function(msg){
-// 		console.log('message: ' + msg);
-// 		io.emit('chat message', msg);
-// 	});
-
 	socket.on('newChar', function(e){
 		population[userId] = {
 			rank: e.rank,
 			file: e.file,
 			chr: e.chr,
 			clr: e.clr,
-			name: e.name,
+			nm: e.nm,
 			lastknownplace: e.lastknownplace
 		};
-		// socket.emit('newCharAdded', population[userId]);
+		var newSpace = e.file + e.rank;
+		occupiedSpaces[newSpace] = population[userId].nm;
+		console.log(occupiedSpaces);
+		io.sockets.emit('newCharAdded', occupiedSpaces);
 		console.log(population);
 	});
 

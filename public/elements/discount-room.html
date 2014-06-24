@@ -3,7 +3,7 @@
 <link rel="import" href="../../bower_components/firebase-element/firebase-import.html">
 
 
-<polymer-element name="discount-room">
+<polymer-element name="discount-room" on-new-char="{{ newCharHandler }}">
 	<template>
 		<style type="text/css">
 			#userconfig {
@@ -264,7 +264,7 @@
 			newfiledown: 0,
 			newrankleft: 0,
 			newrankright: 0,
-			occupied: [],
+			occupied: {},
 			space: " ",
 			lastknownkeys: [],
 
@@ -282,14 +282,34 @@
 				var boundOnKeyUp = this.onKeyUp.bind(this);
 				window.addEventListener("keyup", boundOnKeyUp, false);
 				setInterval(this.screenScrub(), 3000);
-				// var place = '';
-				// var child = this.shadowRoot.querySelector;
-				// socket.on('newCharAdded', function(e){
-				// 	place = '#' + e.file + e.rank;
-				// 	child(place).innerHTML = e.chr;
-				// 	child(place).style.color = e.clr;
-				// });
 				this.readyFlag = 1;
+			},
+
+			newCharHandler: function(payload){
+				console.log(payload.detail);
+				// var palette = this.palette;
+				// var charList = new Array();
+				// for (var i = 0; i < this.characters.length; i++) {
+				// 	charList.push(this.characters[i].chr);
+				// }
+				// var occupied = new Object();
+			// 	// console.log(payload);
+			// 	for (var coords in payload) {
+			// 		var randomChar = charList[Math.floor(Math.random * (charList.length - 1))];
+			// 		var randomColor = palette[Math.floor(Math.random * (palette.length - 1))];
+			// 		// console.log(payload[coords]);
+			// 		// result: object with properties of occupied space coords
+			// 		// and values of objects with name and randomized color/character
+			// 		// this way: changes everyone's colors and characters upon new char
+			// 		// kind of like NH hallucination
+			// 		// not the idea, generally, but let's see if this even works
+			// 		occupied[coords] = { 
+			// 			nm: payload[coords],
+			// 			chr: randomChar,
+			// 			clr: randomColor
+			// 		};
+			// 	}
+			// 	console.log(occupied);
 			},
 
 			screenScrub: function() {
@@ -325,12 +345,12 @@
 					console.log("function onKeyUp: this inside:");
 					console.log(this); }
 					if (this[evt.keyCode]) {
-						this[evt.keyCode]();
+						this[evt.keyCode](evt);
 					}
 				}
 			},
 
-			'37': function(){
+			'37': function(evt){
 				if (this.debug) { console.log("keyhandler: left");
 				console.log("file: " + this.data[this.user].file);
 				console.log("rank: " + this.data[this.user].rank);
@@ -346,7 +366,7 @@
 					this.$.firebase.commitProperty(this.user); 
 				}
 			},
-			'38': function(){
+			'38': function(evt){
 				if (this.debug) { console.log("keyhandler: up");
 				console.log("file: " + this.data[this.user].file);
 				console.log("rank: " + this.data[this.user].rank);
@@ -363,7 +383,7 @@
 					this.$.firebase.commitProperty(this.user);
 				}
 			},
-			'39': function(){
+			'39': function(evt){
 				if (this.debug) { console.log("keyhandler: right");
 				console.log("file: " + this.data[this.user].file);
 				console.log("rank: " + this.data[this.user].rank);
@@ -379,7 +399,7 @@
 					this.$.firebase.commitProperty(this.user);
 				}
 			},
-			'40': function(){
+			'40': function(evt){
 				if (this.debug) { console.log("keyhandler: down");
 				console.log("file: " + this.data[this.user].file);
 				console.log("rank: " + this.data[this.user].rank);
@@ -396,13 +416,15 @@
 					this.$.firebase.commitProperty(this.user);
 				}
 			},
-			'68': function(){
-				if (this.debug) {
-					this.debug = 0;
-					console.log('debug mode off');
-				} else {
-					this.debug = 1;
-					console.log('debug mode on');
+			'192': function(evt){
+				if (evt.ctrlKey && evt.shiftKey) {
+					if (this.debug) {
+						this.debug = 0;
+						console.log('debug mode off');
+					} else {
+						this.debug = 1;
+						console.log('debug mode on');
+					}
 				}
 			},
 
@@ -467,10 +489,10 @@
 				var file = this.files[Math.floor(Math.random() * (this.files.length - 1))];
 				var rank = Math.floor(Math.random()*(this.ranks.length -1));
 				var place = file + rank;
-				if (this.occupied.indexOf(place) === -1) {
-					return place;
-				} else {
+				if (this.occupied.hasOwnProperty(place)) {
 					this.randomPlace();
+				} else {
+					return place;
 				}
 			},
 
@@ -493,7 +515,7 @@
 						file: startfile,
 						chr: uchr,
 						clr: uclr,
-						name: unm,
+						nm: unm,
 						lastknownplace: ""
 					};
 					socket.emit('newChar', this.userState);
