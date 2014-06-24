@@ -217,6 +217,7 @@
 				{name:"closecurlybrace", chr:"}"}, 
 				{name:"tilde", chr:"~"}
 			],
+			charlist: [],
 			palette: [
 				"red", 
 				"yellow", 
@@ -231,6 +232,7 @@
 				"white", 
 				"gray"
 			],
+			
 			selectedChar: "",
 			selectedColor: "",
 			ranks: [],
@@ -266,17 +268,15 @@
 			newrankright: 0,
 			occupied: {},
 			space: " ",
-			lastknownkeys: [],
-
-			userChanged: function(){
-				console.log(this.user);
-			},
 
 			ready: function (){
 				if (this.debug) {console.log('debug mode is set'); 
 				console.log(this.data + ":" + this.keys);}
 				for (i = 0; i < 80; i++) {
 					this.ranks.push(i);
+				}
+				for (var i = 0; i < this.characters.length; i++) {
+					this.charlist.push(this.characters[i].chr);
 				}
 				this.styleColorDivs();
 				var boundOnKeyUp = this.onKeyUp.bind(this);
@@ -285,31 +285,43 @@
 				this.readyFlag = 1;
 			},
 
+			userChanged: function(){
+				console.log(this.user);
+			},
+
 			newCharHandler: function(payload){
 				console.log(payload.detail);
-				// var palette = this.palette;
-				// var charList = new Array();
-				// for (var i = 0; i < this.characters.length; i++) {
-				// 	charList.push(this.characters[i].chr);
-				// }
-				// var occupied = new Object();
-			// 	// console.log(payload);
-			// 	for (var coords in payload) {
-			// 		var randomChar = charList[Math.floor(Math.random * (charList.length - 1))];
-			// 		var randomColor = palette[Math.floor(Math.random * (palette.length - 1))];
-			// 		// console.log(payload[coords]);
+				var list = payload.detail;
+				var rchr = this.randomChar();
+				var rclr = this.randomColor();
+				for (var coords in list) {
+					if (!this.occupied.hasOwnProperty(coords)) {
+						var newNode = this.shadowRoot.getElementById(coords);
+						newNode.innerHTML = rchr;
+						newNode.style.color = rclr;
+						this.occupied[coords] = {
+							nm: list[coords],
+							chr: rchr,
+							clr: rclr
+						};
+					}
+					console.log(this.occupied);
+					console.log("user " + list[coords] + " has entered the room at " + coords);
+				}
 			// 		// result: object with properties of occupied space coords
 			// 		// and values of objects with name and randomized color/character
 			// 		// this way: changes everyone's colors and characters upon new char
 			// 		// kind of like NH hallucination
 			// 		// not the idea, generally, but let's see if this even works
-			// 		occupied[coords] = { 
-			// 			nm: payload[coords],
-			// 			chr: randomChar,
-			// 			clr: randomColor
-			// 		};
-			// 	}
-			// 	console.log(occupied);
+
+			},
+
+			randomChar: function(){
+				return this.charlist[Math.floor(Math.random() * (this.charlist.length - 1))];
+			},
+
+			randomColor: function(){
+				return this.palette[Math.floor(Math.random() * (this.palette.length - 1))];
 			},
 
 			screenScrub: function() {
@@ -335,6 +347,10 @@
 					queryRoot.getElementById(resource[h]).style.opacity=0.9;
 					if (this.debug) { console.log('function styleColorDivs:' + queryRoot.getElementById(resource[h])); }
 				} 
+			},
+
+			occupiedChanged: function(){
+				// code goes here if necessary
 			},
 
 			onKeyUp: function (evt) {
@@ -429,7 +445,7 @@
 			},
 
 			noCollision: function(newplace) {
-				if (this.occupied.indexOf(newplace) === -1) {
+				if (!this.occupied.hasOwnProperty(newplace)) {
 					return true;
 				} else {
 					return false;
@@ -505,8 +521,6 @@
 					alert("Need a name, character and color");
 					return false;
 				} else {
-					// this.lastknownkeys = this.keys;
-					// if (this.debug) { console.log("function sendChar: " + this.lastknownkeys); }
 					var startplace = this.randomPlace();
 					var startfile = startplace.substring(0,1);
 					var startrank = startplace.substring(1);
@@ -543,19 +557,6 @@
 				}
 			},
 
-			childAdded: function(e){
-				// if (this.user == "") {
-				// 	this.user = e.detail.name;
-				// 	console.log('you have been assigned uID ' + this.user);
-				// } no longer need this shit because uuid is always assigned on connect
-				var place = '#' + e.file + e.rank;
-				var child = this.shadowRoot.querySelector(place);
-				child.innerHTML = e.chr;
-				child.style.color=e.clr;
-				this.occupied.push(place.substring(1));
-				console.log("user " + e.detail.value.name + " has entered the room at " + place.substring(1));
-			},
-
 			childChanged: function(e) {
 				if (this.debug) { console.log("function childChanged: " + e); }
 				var chr = e.detail.value.chr;
@@ -564,7 +565,7 @@
 				this.occupied.splice(this.occupied.indexOf(oldplace), 1);
 				var newplace = e.detail.value.file + e.detail.value.rank;
 				this.occupied.push(newplace);
-				this.displayUpdate(oldplace,newplace,chr,clr);
+				this.moveUpdate(oldplace,newplace,chr,clr);
 			},
 
 			childRemoved: function(e) {
@@ -577,10 +578,10 @@
 				console.log("user " + e.detail.value.name + " has left the room");
 			},
 
-			displayUpdate: function(oldplace, newplace, chr, clr) {
-				if (this.debug) { console.log("function displayUpdate: old place: " + this.shadowRoot.getElementById(oldplace).innerHTML); }
+			moveUpdate: function(oldplace, newplace, chr, clr) {
+				if (this.debug) { console.log("function moveUpdate: old place: " + this.shadowRoot.getElementById(oldplace).innerHTML); }
 				this.shadowRoot.getElementById(oldplace).innerHTML = this.space;
-				if (this.debug) { console.log("function displayUpdate: new place: " + this.shadowRoot.getElementById(newplace).innerHTML); }
+				if (this.debug) { console.log("function moveUpdate: new place: " + this.shadowRoot.getElementById(newplace).innerHTML); }
 				this.shadowRoot.getElementById(newplace).innerHTML = chr;
 				this.shadowRoot.getElementById(newplace).style.color = clr;
 			}
