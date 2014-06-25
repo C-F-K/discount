@@ -308,12 +308,6 @@
 					console.log(this.occupied);
 					console.log("user " + list[coords] + " has entered the room at " + coords);
 				}
-			// 		// result: object with properties of occupied space coords
-			// 		// and values of objects with name and randomized color/character
-			// 		// this way: changes everyone's colors and characters upon new char
-			// 		// kind of like NH hallucination
-			// 		// not the idea, generally, but let's see if this even works
-
 			},
 
 			randomChar: function(){
@@ -329,7 +323,7 @@
 					for (var i = 0; i < this.files.length; i++) {
 						for (var j = 0; j < this.ranks.length; j++) {
 							var scrub = this.files[i] + this.ranks[j];
-							if (this.occupied.indexOf(scrub) === -1) {
+							if (!this.occupied.hasOwnProperty(scrub)) {
 								this.shadowRoot.getElementById(scrub).innerHTML = this.space;
 							}
 						}
