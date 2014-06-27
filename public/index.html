@@ -33,6 +33,9 @@
         socket.on('newCharAdded', function(payload){
           room.fire('new-char', payload);
         });
+        socket.on('userLeaving', function(payload){
+          room.fire('user-left', payload);
+        });
       });
     </script>
   </body>

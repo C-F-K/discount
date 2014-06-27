@@ -1,9 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/firebase-element/firebase-element.html">
-<link rel="import" href="../../bower_components/firebase-element/firebase-import.html">
 
-
-<polymer-element name="discount-room" on-new-char="{{ newCharHandler }}">
+<polymer-element 	name="discount-room" 
+					on-new-char="{{ newCharHandler }}"
+					on-user-left="{{ userExitHandler }}">
 	<template>
 		<style type="text/css">
 			#userconfig {
@@ -267,6 +266,7 @@
 			newrankleft: 0,
 			newrankright: 0,
 			occupied: {},
+			occupants: {},
 			space: " ",
 
 			ready: function (){
@@ -286,17 +286,21 @@
 			},
 
 			userChanged: function(){
-				console.log(this.user);
+				console.log('you have been assigned user ID ' + this.user);
+				this.$.userconfig.style.display="block";
 			},
 
 			newCharHandler: function(payload){
 				console.log(payload.detail);
 				var list = payload.detail;
-				var rchr = this.randomChar();
-				var rclr = this.randomColor();
 				for (var coords in list) {
+					if (list[coords] == this.user) {
+						console.log('local user');
+					}
 					if (!this.occupied.hasOwnProperty(coords)) {
 						var newNode = this.shadowRoot.getElementById(coords);
+						var rchr = this.randomChar();
+						var rclr = this.randomColor();
 						newNode.innerHTML = rchr;
 						newNode.style.color = rclr;
 						this.occupied[coords] = {
@@ -304,10 +308,22 @@
 							chr: rchr,
 							clr: rclr
 						};
+						// console.log(this.occupied);
+						console.log("user " + list[coords] + " has entered the room at " + coords);
 					}
-					console.log(this.occupied);
-					console.log("user " + list[coords] + " has entered the room at " + coords);
 				}
+			},
+
+			userExitHandler: function(payload){
+				// console.log(payload);
+				// var uid = this.user;
+				var place = payload.detail;
+				var lnm = this.occupied[place].nm;
+				delete this.occupied[place];
+				// console.log('occupied:');
+				// console.log(this.occupied);
+				this.shadowRoot.getElementById(place).innerHTML = this.space;
+				console.log("user " + lnm + " has left the room");
 			},
 
 			randomChar: function(){
@@ -518,6 +534,7 @@
 					var startplace = this.randomPlace();
 					var startfile = startplace.substring(0,1);
 					var startrank = startplace.substring(1);
+
 					this.userState = {
 						rank: startrank,
 						file: startfile,
@@ -526,6 +543,7 @@
 						nm: unm,
 						lastknownplace: ""
 					};
+
 					socket.emit('newChar', this.userState);
 				}
 				this.shadowRoot.querySelector("#userconfig").style.display="none";

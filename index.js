@@ -24,24 +24,42 @@ io.sockets.on('connection', function(socket){
 	population[userId] = new Object();
 	console.log(population);
 	socket.on('newChar', function(e){
+
 		population[userId] = {
+			id: userId,
 			rank: e.rank,
 			file: e.file,
 			chr: e.chr,
 			clr: e.clr,
 			nm: e.nm,
 			lastknownplace: e.lastknownplace
+			
 		};
 		var newSpace = e.file + e.rank;
-		occupiedSpaces[newSpace] = population[userId].nm;
+		occupiedSpaces[newSpace] = userId;
+		console.log('occupied:');
 		console.log(occupiedSpaces);
-		io.sockets.emit('newCharAdded', occupiedSpaces);
+		console.log('user has specified char:');
 		console.log(population);
+		io.sockets.emit('newCharAdded', occupiedSpaces);
+	});
+
+	socket.on('requestCharData',  function(payload){
+
+	});
+	socket.on('updateCharData', function(payload){
+
 	});
 
 	socket.on('disconnect', function(){
+		var emptySpace = population[userId].file + population[userId].rank;
+		io.sockets.emit('userLeaving', emptySpace)
 		delete population[userId];
-		console.log(population);
+		delete occupiedSpaces[emptySpace];
+		// console.log('population:');
+		// console.log(population);
+		// console.log('occupied:');
+		// console.log(occupiedSpaces);
 	});
 });
 
