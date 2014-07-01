@@ -294,9 +294,9 @@
 				console.log(payload.detail);
 				var list = payload.detail;
 				for (var coords in list) {
-					if (list[coords] == this.user) {
-						console.log('local user');
-					}
+					// if (list[coords] == this.user) { // this sorta correctly identifies local user
+					// 	console.log('local user'); // but it's currently coded to loop stupidly
+					// }
 					if (!this.occupied.hasOwnProperty(coords)) {
 						var newNode = this.shadowRoot.getElementById(coords);
 						var rchr = this.randomChar();
