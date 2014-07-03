@@ -292,21 +292,22 @@
 
 			newCharHandler: function(payload){
 				// console.log(payload.detail);
-
 				var list = payload.detail;
 				for (var coords in list) {
 					if (list[coords] == this.user) {
-						var newNode = this.shadowRoot.getElementById(coords);
-						var lchr = this.userState.chr;
-						var lclr = this.userState.clr;
-						newNode.innerHTML = lchr;
-						newNode.style.color = lclr;
-						this.occupied[coords] = {
-							nm: list[coords],
-							chr: lchr,
-							clr: lclr
-						};
-						console.log("user " + list[coords] + " has entered the room at " + coords);
+						if (!this.occupied.hasOwnProperty(coords)) {
+							var newNode = this.shadowRoot.getElementById(coords);
+							var lchr = this.userState.chr;
+							var lclr = this.userState.clr;
+							newNode.innerHTML = lchr;
+							newNode.style.color = lclr;
+							this.occupied[coords] = {
+								nm: list[coords],
+								chr: lchr,
+								clr: lclr
+							};
+							console.log("user " + list[coords] + " has entered the room at " + coords);
+						}
 					} else {
 						if (!this.occupied.hasOwnProperty(coords)) {
 							var newNode = this.shadowRoot.getElementById(coords);
