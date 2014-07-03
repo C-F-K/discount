@@ -291,26 +291,38 @@
 			},
 
 			newCharHandler: function(payload){
-				console.log(payload.detail);
+				// console.log(payload.detail);
+
 				var list = payload.detail;
 				for (var coords in list) {
-					// if (list[coords] == this.user) { // this sorta correctly identifies local user
-					// 	console.log('local user'); // but it's currently coded to loop stupidly
-					// }
-					if (!this.occupied.hasOwnProperty(coords)) {
+					if (list[coords] == this.user) {
 						var newNode = this.shadowRoot.getElementById(coords);
-						var rchr = this.randomChar();
-						var rclr = this.randomColor();
-						newNode.innerHTML = rchr;
-						newNode.style.color = rclr;
+						var lchr = this.userState.chr;
+						var lclr = this.userState.clr;
+						newNode.innerHTML = lchr;
+						newNode.style.color = lclr;
 						this.occupied[coords] = {
 							nm: list[coords],
-							chr: rchr,
-							clr: rclr
+							chr: lchr,
+							clr: lclr
 						};
-						// console.log(this.occupied);
 						console.log("user " + list[coords] + " has entered the room at " + coords);
-					}
+					} else {
+						if (!this.occupied.hasOwnProperty(coords)) {
+							var newNode = this.shadowRoot.getElementById(coords);
+							var rchr = this.randomChar();
+							var rclr = this.randomColor();
+							newNode.innerHTML = rchr;
+							newNode.style.color = rclr;
+							this.occupied[coords] = {
+								nm: list[coords],
+								chr: rchr,
+								clr: rclr
+							};
+							// console.log(this.occupied);
+							console.log("user " + list[coords] + " has entered the room at " + coords);
+						}
+					}			
 				}
 			},
 

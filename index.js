@@ -32,9 +32,9 @@ io.sockets.on('connection', function(socket){
 			chr: e.chr,
 			clr: e.clr,
 			nm: e.nm,
-			lastknownplace: e.lastknownplace
-			
+			lastknownplace: e.lastknownplace	
 		};
+
 		var newSpace = e.file + e.rank;
 		occupiedSpaces[newSpace] = userId;
 		console.log('occupied:');
