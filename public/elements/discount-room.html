@@ -390,69 +390,55 @@
 			},
 
 			'37': function(evt){
-				if (this.debug) { console.log("keyhandler: left");
-				console.log("file: " + this.data[this.user].file);
-				console.log("rank: " + this.data[this.user].rank);
-				console.log("rank after moving: " + this.newrankleft); }
-				if (this.data[this.user].rank === 0) {
+				if (this.userState.rank === 0) {
 					return false;
 				}
-				var oldplace = this.data[this.user].file + this.data[this.user].rank;
-				this.data[this.user].lastknownplace = oldplace;
-				var newplace = this.data[this.user].file + this.newrankleft;
+				var oldplace = this.userState.file + this.userState.rank;
+				this.userState.lastknownplace = oldplace;
+				var newplace = this.userState.file + this.newrankleft;
 				if (this.noCollision(newplace)) {
-					this.data[this.user].rank = this.newrankleft;
-					this.$.firebase.commitProperty(this.user); 
+					this.userState.rank = this.newrankleft;
+					socket.emit('userMoved', this.userState);
+					// this.$.firebase.commitProperty(this.user); //woo 
 				}
 			},
 			'38': function(evt){
-				if (this.debug) { console.log("keyhandler: up");
-				console.log("file: " + this.data[this.user].file);
-				console.log("rank: " + this.data[this.user].rank);
-				console.log("file index after moving: " + this.newfileup);
-				console.log("file after moving: " + this.files[this.newfileup]); }
-				if (this.data[this.user].file === 'a') {
+				if (this.userState.file === 'a') {
 					return false;
 				}
-				var oldplace = this.data[this.user].file + this.data[this.user].rank;
-				this.data[this.user].lastknownplace = oldplace;
-				var newplace = this.newfileup + this.data[this.user].rank;
+				var oldplace = this.userState.file + this.userState.rank;
+				this.userState.lastknownplace = oldplace;
+				var newplace = this.newfileup + this.userState.rank;
 				if (this.noCollision(newplace)) {
-					this.data[this.user].file = this.files[this.newfileup];
-					this.$.firebase.commitProperty(this.user);
+					this.userState.file = this.files[this.newfileup];
+					socket.emit('userMoved', this.userState);
+					// this.$.firebase.commitProperty(this.user); //woo
 				}
 			},
 			'39': function(evt){
-				if (this.debug) { console.log("keyhandler: right");
-				console.log("file: " + this.data[this.user].file);
-				console.log("rank: " + this.data[this.user].rank);
-				console.log("rank after moving: " + this.newrankright); }
-				if (this.data[this.user].rank === 79) {
+				if (this.userState.rank === 79) {
 					return false;
 				}
-				var oldplace = this.data[this.user].file + this.data[this.user].rank;
-				this.data[this.user].lastknownplace = oldplace;
-				var newplace = this.data[this.user].file + this.newrankright;
+				var oldplace = this.userState.file + this.userState.rank;
+				this.userState.lastknownplace = oldplace;
+				var newplace = this.userState.file + this.newrankright;
 				if (this.noCollision(newplace)) {
-					this.data[this.user].rank = this.newrankright;
-					this.$.firebase.commitProperty(this.user);
+					this.userState.rank = this.newrankright;
+					socket.emit('userMoved', this.userState);
+					// this.$.firebase.commitProperty(this.user); //woo
 				}
 			},
 			'40': function(evt){
-				if (this.debug) { console.log("keyhandler: down");
-				console.log("file: " + this.data[this.user].file);
-				console.log("rank: " + this.data[this.user].rank);
-				console.log("file index after moving: " + this.newfiledown);
-				console.log("file after moving: " + this.files[this.newfiledown]); }
-				if (this.data[this.user].file === 'x') {
+				if (this.userState.file === 'x') {
 					return false;
 				}
-				var oldplace = this.data[this.user].file + this.data[this.user].rank;
-				this.data[this.user].lastknownplace = oldplace;
-				var newplace = this.newfiledown + this.data[this.user].rank;
+				var oldplace = this.userState.file + this.userState.rank;
+				this.userState.lastknownplace = oldplace;
+				var newplace = this.newfiledown + this.userState.rank;
 				if (this.noCollision(newplace)) {
-					this.data[this.user].file = this.files[this.newfiledown];
-					this.$.firebase.commitProperty(this.user);
+					this.userState.file = this.files[this.newfiledown];
+					socket.emit('userMoved', this.userState);
+					// this.$.firebase.commitProperty(this.user); //woo
 				}
 			},
 			'192': function(evt){
@@ -465,6 +451,45 @@
 						console.log('debug mode on');
 					}
 				}
+			},
+
+			dataChange: function() {
+				if (this.user == null) {
+					console.log("you are not yet in the room");
+				} else {
+					if (this.userState) {
+						var place = this.userState.file + this.userState.rank;
+						console.log("your position is " + place);
+						var filenum = this.files.indexOf(this.userState.file)
+						this.newfiledown = filenum;
+						this.newfiledown++;
+						this.newfileup = filenum;
+						this.newfileup--;
+						this.newrankleft = this.userState.rank;
+						this.newrankleft--;
+						this.newrankright = this.userState.rank;
+						this.newrankright++;
+					}
+				}
+			},
+
+			childChanged: function(e) {
+				if (this.debug) { console.log("function childChanged: " + e); }
+				var chr = e.detail.value.chr;
+				var clr = e.detail.value.clr;
+				var oldplace = e.detail.value.lastknownplace;
+				this.occupied.splice(this.occupied.indexOf(oldplace), 1);
+				var newplace = e.detail.value.file + e.detail.value.rank;
+				this.occupied.push(newplace);
+				this.moveUpdate(oldplace,newplace,chr,clr);
+			},
+
+			moveUpdate: function(oldplace, newplace, chr, clr) {
+				if (this.debug) { console.log("function moveUpdate: old place: " + this.shadowRoot.getElementById(oldplace).innerHTML); }
+				this.shadowRoot.getElementById(oldplace).innerHTML = this.space;
+				if (this.debug) { console.log("function moveUpdate: new place: " + this.shadowRoot.getElementById(newplace).innerHTML); }
+				this.shadowRoot.getElementById(newplace).innerHTML = chr;
+				this.shadowRoot.getElementById(newplace).style.color = clr;
 			},
 
 			noCollision: function(newplace) {
@@ -540,6 +565,7 @@
 				var unm = this.$.uname.value;
 				var uchr = this.selectedChar;
 				var uclr = this.selectedColor; 
+				var uid = this.user;
 				if (uchr == "" || unm == "" || uclr == "") {
 					alert("Need a name, character and color");
 					return false;
@@ -549,6 +575,7 @@
 					var startrank = startplace.substring(1);
 
 					this.userState = {
+						id: uid,
 						rank: startrank,
 						file: startfile,
 						chr: uchr,
@@ -560,55 +587,6 @@
 					socket.emit('newChar', this.userState);
 				}
 				this.shadowRoot.querySelector("#userconfig").style.display="none";
-			},
-
-			dataChange: function() {
-				if (this.user == "") {
-					console.log("you are not yet in the room");
-				} else {
-					if (this.data[this.user]) {
-						var place = this.data[this.user].file + this.data[this.user].rank;
-						console.log("your position is " + place);
-						var filenum = this.files.indexOf(this.data[this.user].file)
-						this.newfiledown = filenum;
-						this.newfiledown++;
-						this.newfileup = filenum;
-						this.newfileup--;
-						this.newrankleft = this.data[this.user].rank;
-						this.newrankleft--;
-						this.newrankright = this.data[this.user].rank;
-						this.newrankright++;
-					}
-				}
-			},
-
-			childChanged: function(e) {
-				if (this.debug) { console.log("function childChanged: " + e); }
-				var chr = e.detail.value.chr;
-				var clr = e.detail.value.clr;
-				var oldplace = e.detail.value.lastknownplace;
-				this.occupied.splice(this.occupied.indexOf(oldplace), 1);
-				var newplace = e.detail.value.file + e.detail.value.rank;
-				this.occupied.push(newplace);
-				this.moveUpdate(oldplace,newplace,chr,clr);
-			},
-
-			childRemoved: function(e) {
-				if (this.debug) { console.log("function childRemoved: " + e); }
-				var place = e.detail.value.file + e.detail.value.rank;
-				this.occupied.splice(this.occupied.indexOf(place), 1);
-				this.shadowRoot.getElementById(place).innerHTML = this.space;
-				var unStrungUID = "data." + e.detail.name;
-				this.observe.splice(this.observe.indexOf(unStrungUID), 1);
-				console.log("user " + e.detail.value.name + " has left the room");
-			},
-
-			moveUpdate: function(oldplace, newplace, chr, clr) {
-				if (this.debug) { console.log("function moveUpdate: old place: " + this.shadowRoot.getElementById(oldplace).innerHTML); }
-				this.shadowRoot.getElementById(oldplace).innerHTML = this.space;
-				if (this.debug) { console.log("function moveUpdate: new place: " + this.shadowRoot.getElementById(newplace).innerHTML); }
-				this.shadowRoot.getElementById(newplace).innerHTML = chr;
-				this.shadowRoot.getElementById(newplace).style.color = clr;
 			}
 		});		
 	</script>

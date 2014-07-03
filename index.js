@@ -40,11 +40,20 @@ io.sockets.on('connection', function(socket){
 		console.log('occupied:');
 		console.log(occupiedSpaces);
 		console.log('user has specified char:');
-		console.log(population);
+		console.log(population[userId]);
 		io.sockets.emit('newCharAdded', occupiedSpaces);
 	});
 
-	socket.on('requestCharData',  function(payload){
+	socket.on('userMoved', function(payload){
+		var mid = payload.id;
+		var lkp = payload.lastknownplace
+		delete occupiedSpaces[lkp]
+		var newSpace = payload.file + payload.rank;
+		occupiedSpaces[newSpace] = mid;
+
+	});
+
+	socket.on('requestCharData', function(payload){
 
 	});
 	socket.on('updateCharData', function(payload){
