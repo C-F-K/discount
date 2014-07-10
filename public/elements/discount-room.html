@@ -2,7 +2,9 @@
 
 <polymer-element 	name="discount-room" 
 					on-new-char="{{ newCharHandler }}"
-					on-user-left="{{ userExitHandler }}">
+					on-user-left="{{ userExitHandler }}"
+					on-moved-user="{{ movedUserHandler }}"
+					on-data-change="{{ dataChange }}">
 	<template>
 		<style type="text/css">
 			#userconfig {
@@ -231,7 +233,6 @@
 				"white", 
 				"gray"
 			],
-			
 			selectedChar: "",
 			selectedColor: "",
 			ranks: [],
@@ -266,12 +267,9 @@
 			newrankleft: 0,
 			newrankright: 0,
 			occupied: {},
-			occupants: {},
 			space: " ",
 
 			ready: function (){
-				if (this.debug) {console.log('debug mode is set'); 
-				console.log(this.data + ":" + this.keys);}
 				for (i = 0; i < 80; i++) {
 					this.ranks.push(i);
 				}
@@ -372,10 +370,6 @@
 				} 
 			},
 
-			occupiedChanged: function(){
-				// code goes here if necessary
-			},
-
 			onKeyUp: function (evt) {
 				if (this.debug) { console.log("function onKeyUp: context:");
 				console.log(this); }
@@ -398,7 +392,8 @@
 				var newplace = this.userState.file + this.newrankleft;
 				if (this.noCollision(newplace)) {
 					this.userState.rank = this.newrankleft;
-					socket.emit('userMoved', this.userState);
+					var movePayload = [this.userState.id, newplace];
+					socket.emit('userMoved', movePayload);
 					// this.$.firebase.commitProperty(this.user); //woo 
 				}
 			},
@@ -411,7 +406,8 @@
 				var newplace = this.newfileup + this.userState.rank;
 				if (this.noCollision(newplace)) {
 					this.userState.file = this.files[this.newfileup];
-					socket.emit('userMoved', this.userState);
+					var movePayload = [this.userState.id, newplace];
+					socket.emit('userMoved', movePayload);
 					// this.$.firebase.commitProperty(this.user); //woo
 				}
 			},
@@ -424,7 +420,8 @@
 				var newplace = this.userState.file + this.newrankright;
 				if (this.noCollision(newplace)) {
 					this.userState.rank = this.newrankright;
-					socket.emit('userMoved', this.userState);
+					var movePayload = [this.userState.id, newplace];
+					socket.emit('userMoved', movePayload);
 					// this.$.firebase.commitProperty(this.user); //woo
 				}
 			},
@@ -437,7 +434,8 @@
 				var newplace = this.newfiledown + this.userState.rank;
 				if (this.noCollision(newplace)) {
 					this.userState.file = this.files[this.newfiledown];
-					socket.emit('userMoved', this.userState);
+					var movePayload = [this.userState.id, newplace];
+					socket.emit('userMoved', movePayload);
 					// this.$.firebase.commitProperty(this.user); //woo
 				}
 			},
@@ -452,6 +450,27 @@
 					}
 				}
 			},
+
+			movedUserHandler: function(resPayload){
+				// this.moveUpdate(resPayload);
+			},
+
+			moveUpdate: function([oldplace, newplace, chr, clr]) {
+				this.shadowRoot.getElementById(oldplace).innerHTML = this.space;
+				this.shadowRoot.getElementById(newplace).innerHTML = chr;
+				this.shadowRoot.getElementById(newplace).style.color = clr;
+				// this.fire('data-change',);
+			},
+
+			// occupiedChanged: function(){
+			// 	var chr = e.detail.value.chr;
+			// 	var clr = e.detail.value.clr;
+			// 	var oldplace = e.detail.value.lastknownplace;
+			// 	this.occupied.splice(this.occupied.indexOf(oldplace), 1);
+			// 	var newplace = e.detail.value.file + e.detail.value.rank;
+			// 	this.occupied.push(newplace);
+			// 	this.moveUpdate(oldplace,newplace,chr,clr);
+			// },
 
 			dataChange: function() {
 				if (this.user == null) {
@@ -482,15 +501,7 @@
 				var newplace = e.detail.value.file + e.detail.value.rank;
 				this.occupied.push(newplace);
 				this.moveUpdate(oldplace,newplace,chr,clr);
-			},
-
-			moveUpdate: function(oldplace, newplace, chr, clr) {
-				if (this.debug) { console.log("function moveUpdate: old place: " + this.shadowRoot.getElementById(oldplace).innerHTML); }
-				this.shadowRoot.getElementById(oldplace).innerHTML = this.space;
-				if (this.debug) { console.log("function moveUpdate: new place: " + this.shadowRoot.getElementById(newplace).innerHTML); }
-				this.shadowRoot.getElementById(newplace).innerHTML = chr;
-				this.shadowRoot.getElementById(newplace).style.color = clr;
-			},
+			},			
 
 			noCollision: function(newplace) {
 				if (!this.occupied.hasOwnProperty(newplace)) {

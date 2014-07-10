@@ -1,0 +1,32 @@
+goal: 
+	establish unique ID on connect - DONE
+	send user its own ID (DONE) + add that ID to the top level of an object on the server DONE
+	object is mined for second (public) object: properties are locations (as strings), values are chr and clr
+ 	user sends two data: its ID and any changes (must also include 'remove')
+	every so often (1sec?) update all displays based on public object?
+
+data structure:
+
+	client:
+		list of occupied spaces	
+		list of users with positions and (randomized) appearances -> separate version of population object 
+		on new char:
+			assign randomized appearance to name at position
+			assign name, appearance, position to list of users
+			add position to list of occupied spaces
+		
+
+	server:
+		population object
+			(names, positions, real appearances, lastknownplaces)
+		on new char: 
+			fire name and position at client
+
+
+
+motion:
+	key event fires id, newplace
+	server updates population[id] with lastknownplace = file + rank
+	server updates population[id] with file = newplace.substring(0,1) and rank = newplace.substring(1)
+	server updates occupiedspaces: new = [lastknownplace], delete [lastknownplace], [newplace] = new
+	server broadcasts ?
