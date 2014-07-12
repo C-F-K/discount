@@ -283,13 +283,106 @@
 				this.readyFlag = 1;
 			},
 
+			styleColorDivs: function(){
+				var queryRoot = this.shadowRoot;
+				var resource = this.palette;
+				for (var h = 0; h < this.palette.length; h++) {
+					queryRoot.getElementById(resource[h]).style.background=resource[h];
+					queryRoot.getElementById(resource[h]).style.opacity=0.9;
+				} 
+			},
+
+			screenScrub: function() {
+				if (this.readyFlag) {
+					for (var i = 0; i < this.files.length; i++) {
+						for (var j = 0; j < this.ranks.length; j++) {
+							var scrub = this.files[i] + this.ranks[j];
+							if (!this.occupied.hasOwnProperty(scrub)) {
+								this.shadowRoot.getElementById(scrub).innerHTML = this.space;
+							}
+						}
+					}
+				}
+			},
+
 			userChanged: function(){
 				console.log('you have been assigned user ID ' + this.user);
 				this.$.userconfig.style.display="block";
 			},
 
+			clickChar: function(el) {
+				if (el.toElement.className == "possiblechar selected") {
+					return false;
+				} else {
+					var clickedId = "#" + el.toElement.id;
+					var queried = this.shadowRoot;
+					var resource = this.characters;
+					var preselect = "";
+					for (var i = 0; i < resource.length; i++) {
+						var itr = "#" + resource[i].name;
+						queried.querySelector(itr).className = "possiblechar";
+					}
+					var clicked = this.shadowRoot.querySelector(clickedId);
+					clicked.className = clicked.className + " selected";
+					var slicedId = clickedId.substring(1);
+					for (var j = 0; j < resource.length; j++) {
+						if (resource[j].name == slicedId) {
+							preselect = resource[j].chr;
+						}
+					}
+					this.selectedChar = preselect;
+				}
+			},
+
+			fadeOthers: function(e){
+				var resource = this.palette;
+				for (var k = 0; k < this.palette.length; k++){
+					this.shadowRoot.getElementById(this.palette[k]).style.opacity=0.3;
+				}
+				this.shadowRoot.getElementById(e.toElement.id).style.opacity=1;
+				this.selectedColor = e.toElement.id;
+			},
+
+			sendChar: function(){
+				var unm = this.$.uname.value;
+				var uchr = this.selectedChar;
+				var uclr = this.selectedColor; 
+				var uid = this.user;
+				if (uchr == "" || unm == "" || uclr == "") {
+					alert("Need a name, character and color");
+					return false;
+				} else {
+					var startplace = this.randomPlace();
+					var startfile = startplace.substring(0,1);
+					var startrank = startplace.substring(1);
+
+					this.userState = {
+						id: uid,
+						rank: startrank,
+						file: startfile,
+						chr: uchr,
+						clr: uclr,
+						nm: unm,
+						lastknownplace: ""
+					};
+
+					socket.emit('newChar', this.userState);
+				}
+				this.shadowRoot.querySelector("#userconfig").style.display="none";
+			},
+
+			randomPlace: function() {
+				var file = this.files[Math.floor(Math.random() * (this.files.length - 1))];
+				var rank = Math.floor(Math.random()*(this.ranks.length -1));
+				var place = file + rank;
+				if (this.occupied.hasOwnProperty(place)) {
+					this.randomPlace();
+				} else {
+					return place;
+				}
+			},
+
 			newCharHandler: function(payload){
-				// console.log(payload.detail);
 				var list = payload.detail;
 				for (var coords in list) {
 					if (list[coords] == this.user) {
@@ -318,24 +411,11 @@
 								chr: rchr,
 								clr: rclr
 							};
-							// console.log(this.occupied);
 							console.log("user " + list[coords] + " has entered the room at " + coords);
 						}
 					}			
 				}
 				this.fire('data-change');
-			},
-
-			userExitHandler: function(payload){
-				// console.log(payload);
-				// var uid = this.user;
-				var place = payload.detail;
-				var lnm = this.occupied[place].nm;
-				delete this.occupied[place];
-				// console.log('occupied:');
-				// console.log(this.occupied);
-				this.shadowRoot.getElementById(place).innerHTML = this.space;
-				console.log("user " + lnm + " has left the room");
 			},
 
 			randomChar: function(){
@@ -346,38 +426,8 @@
 				return this.palette[Math.floor(Math.random() * (this.palette.length - 1))];
 			},
 
-			screenScrub: function() {
-				if (this.readyFlag) {
-					for (var i = 0; i < this.files.length; i++) {
-						for (var j = 0; j < this.ranks.length; j++) {
-							var scrub = this.files[i] + this.ranks[j];
-							if (!this.occupied.hasOwnProperty(scrub)) {
-								this.shadowRoot.getElementById(scrub).innerHTML = this.space;
-							}
-						}
-					}
-				}
-			},
-
-			styleColorDivs: function(){
-				var queryRoot = this.shadowRoot;
-				if (this.debug) { console.log('function styleColorDivs:' + queryRoot); }
-				var resource = this.palette;
-				if (this.debug) { console.log('function styleColorDivs:' + resource); }
-				for (var h = 0; h < this.palette.length; h++) {
-					queryRoot.getElementById(resource[h]).style.background=resource[h];
-					queryRoot.getElementById(resource[h]).style.opacity=0.9;
-					if (this.debug) { console.log('function styleColorDivs:' + queryRoot.getElementById(resource[h])); }
-				} 
-			},
-
 			onKeyUp: function (evt) {
-				if (this.debug) { console.log("function onKeyUp: context:");
-				console.log(this); }
 				if (evt = evt ? evt : window.event ? event : null) {
-					if (this.debug) { console.log(evt.keyCode);
-					console.log("function onKeyUp: this inside:");
-					console.log(this); }
 					if (this[evt.keyCode]) {
 						this[evt.keyCode](evt);
 					}
@@ -448,12 +498,20 @@
 				}
 			},
 
+			noCollision: function(newplace) {
+				if (!this.occupied.hasOwnProperty(newplace)) {
+					return true;
+				} else {
+					return false;
+				}
+			},
+
+			// when extending to multiplayer roguelike: 
+			//		add function here to do combat
+			//		called from keyhandler when noCollision returns false.
+
 			movedUserHandler: function(resPayload){
 				var res = resPayload.detail;
-				// console.log('occupied');
-				// console.log(this.occupied);
-				// console.log('payload');
-				// console.log(resPayload);
 				var mid = res[0];
 				var oldplace = res[1];
 				var newplace = res[2];
@@ -472,34 +530,7 @@
 				this.shadowRoot.getElementById(newplace).innerHTML = chr;
 				this.shadowRoot.getElementById(newplace).style.color = clr;
 				this.fire('data-change');
-				// if (this.user == null) {
-				// 	console.log("you are not yet in the room");
-				// } else {
-				// 	if (this.userState) {
-				// 		var place = this.userState.file + this.userState.rank;
-				// 		console.log("your position is " + place);
-				// 		var filenum = this.files.indexOf(this.userState.file)
-				// 		this.newfiledown = filenum;
-				// 		this.newfiledown++;
-				// 		this.newfileup = filenum;
-				// 		this.newfileup--;
-				// 		this.newrankleft = this.userState.rank;
-				// 		this.newrankleft--;
-				// 		this.newrankright = this.userState.rank;
-				// 		this.newrankright++;
-				// 	}
-				// }
 			},
-
-			// occupiedChanged: function(){
-			// 	var chr = e.detail.value.chr;
-			// 	var clr = e.detail.value.clr;
-			// 	var oldplace = e.detail.value.lastknownplace;
-			// 	this.occupied.splice(this.occupied.indexOf(oldplace), 1);
-			// 	var newplace = e.detail.value.file + e.detail.value.rank;
-			// 	this.occupied.push(newplace);
-			// 	this.moveUpdate(oldplace,newplace,chr,clr);
-			// },
 
 			dataChange: function() {
 				if (this.user == null) {
@@ -519,114 +550,14 @@
 						this.newrankright++;
 					}
 				}
-			},
+			},			
 
-			// childChanged: function(e) {
-			// 	if (this.debug) { console.log("function childChanged: " + e); }
-			// 	var chr = e.detail.value.chr;
-			// 	var clr = e.detail.value.clr;
-			// 	var oldplace = e.detail.value.lastknownplace;
-			// 	this.occupied.splice(this.occupied.indexOf(oldplace), 1);
-			// 	var newplace = e.detail.value.file + e.detail.value.rank;
-			// 	this.occupied.push(newplace);
-			// 	this.moveUpdate(oldplace,newplace,chr,clr);
-			// },			
-
-			noCollision: function(newplace) {
-				if (!this.occupied.hasOwnProperty(newplace)) {
-					return true;
-				} else {
-					return false;
-				}
-			},
-
-			// when extending to multiplayer roguelike: 
-			//		add function here to do combat
-			//		called from keyhandler when noCollision returns false.
-			
-			clickChar: function(el) {
-				if (this.debug) { console.log("function clickChar: " + el.toElement.id);
-				console.log (el.toElement.className); }
-				if (el.toElement.className == "possiblechar selected") {
-					return false;
-				} else {
-					var clickedId = "#" + el.toElement.id;
-					var queried = this.shadowRoot;
-					var resource = this.characters;
-					var preselect = "";
-					if (this.debug) { console.log("function clickChar: " + this.shadowRoot.querySelector(clickedId).className);
-					console.log(this.shadowRoot.querySelectorAll(".possiblechar").array());
-					console.log(this.characters); }
-					for (var i = 0; i < resource.length; i++) {
-						if (this.debug) { console.log("function clickChar: " + queried.querySelector(".possiblechar")); }
-						var itr = "#" + resource[i].name;
-						if (this.debug) { console.log("function clickChar: " + itr); }
-						queried.querySelector(itr).className = "possiblechar";
-					}
-					var clicked = this.shadowRoot.querySelector(clickedId);
-					clicked.className = clicked.className + " selected";
-					var slicedId = clickedId.substring(1);
-					for (var j = 0; j < resource.length; j++) {
-						if (resource[j].name == slicedId) {
-							preselect = resource[j].chr;
-						}
-					}
-					this.selectedChar = preselect;
-					if (this.debug) { console.log("function clickChar: " + this.selectedChar);
-					console.log(this.shadowRoot.querySelector(clickedId).className); }
-				}
-			},
-
-			fadeOthers: function(e){
-				if (this.debug) { console.log("function fadeOthers: " + e.toElement.id); }
-				var resource = this.palette;
-				if (this.debug) { console.log("function fadeOthers: " + resource); }
-				for (var k = 0; k < this.palette.length; k++){
-					this.shadowRoot.getElementById(this.palette[k]).style.opacity=0.3;
-				}
-				this.shadowRoot.getElementById(e.toElement.id).style.opacity=1;
-				this.selectedColor = e.toElement.id;
-				if (this.debug) { console.log("function fadeOthers: " + this.selectedColor); }
-			},
-
-			randomPlace: function() {
-				var file = this.files[Math.floor(Math.random() * (this.files.length - 1))];
-				var rank = Math.floor(Math.random()*(this.ranks.length -1));
-				var place = file + rank;
-				if (this.occupied.hasOwnProperty(place)) {
-					this.randomPlace();
-				} else {
-					return place;
-				}
-			},
-
-			sendChar: function(){
-				// evt.preventDefault();
-				var unm = this.$.uname.value;
-				var uchr = this.selectedChar;
-				var uclr = this.selectedColor; 
-				var uid = this.user;
-				if (uchr == "" || unm == "" || uclr == "") {
-					alert("Need a name, character and color");
-					return false;
-				} else {
-					var startplace = this.randomPlace();
-					var startfile = startplace.substring(0,1);
-					var startrank = startplace.substring(1);
-
-					this.userState = {
-						id: uid,
-						rank: startrank,
-						file: startfile,
-						chr: uchr,
-						clr: uclr,
-						nm: unm,
-						lastknownplace: ""
-					};
-
-					socket.emit('newChar', this.userState);
-				}
-				this.shadowRoot.querySelector("#userconfig").style.display="none";
+			userExitHandler: function(payload){
+				var place = payload.detail;
+				var lnm = this.occupied[place].nm;
+				delete this.occupied[place];
+				this.shadowRoot.getElementById(place).innerHTML = this.space;
+				console.log("user " + lnm + " has left the room");
 			}
 		});		
 	</script>
