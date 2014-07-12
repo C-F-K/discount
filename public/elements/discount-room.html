@@ -323,6 +323,7 @@
 						}
 					}			
 				}
+				this.fire('data-change');
 			},
 
 			userExitHandler: function(payload){
@@ -394,7 +395,6 @@
 					this.userState.rank = this.newrankleft;
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
-					// this.$.firebase.commitProperty(this.user); //woo 
 				}
 			},
 			'38': function(evt){
@@ -403,12 +403,11 @@
 				}
 				var oldplace = this.userState.file + this.userState.rank;
 				this.userState.lastknownplace = oldplace;
-				var newplace = this.newfileup + this.userState.rank;
+				var newplace = this.files[this.newfileup] + this.userState.rank;
 				if (this.noCollision(newplace)) {
 					this.userState.file = this.files[this.newfileup];
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
-					// this.$.firebase.commitProperty(this.user); //woo
 				}
 			},
 			'39': function(evt){
@@ -422,7 +421,6 @@
 					this.userState.rank = this.newrankright;
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
-					// this.$.firebase.commitProperty(this.user); //woo
 				}
 			},
 			'40': function(evt){
@@ -431,12 +429,11 @@
 				}
 				var oldplace = this.userState.file + this.userState.rank;
 				this.userState.lastknownplace = oldplace;
-				var newplace = this.newfiledown + this.userState.rank;
+				var newplace = this.files[this.newfiledown] + this.userState.rank;
 				if (this.noCollision(newplace)) {
 					this.userState.file = this.files[this.newfiledown];
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
-					// this.$.firebase.commitProperty(this.user); //woo
 				}
 			},
 			'192': function(evt){
@@ -452,14 +449,46 @@
 			},
 
 			movedUserHandler: function(resPayload){
-				// this.moveUpdate(resPayload);
+				var res = resPayload.detail;
+				// console.log('occupied');
+				// console.log(this.occupied);
+				// console.log('payload');
+				// console.log(resPayload);
+				var mid = res[0];
+				var oldplace = res[1];
+				var newplace = res[2];
+				var newcoords = this.occupied[oldplace];
+				if (newcoords.nm == mid) {
+					var mchr = newcoords.chr;
+					var mclr = newcoords.clr;
+					delete this.occupied[oldplace];
+					this.occupied[newplace] = newcoords;
+					this.moveUpdate(oldplace, newplace, mchr, mclr);
+				}
 			},
 
-			moveUpdate: function([oldplace, newplace, chr, clr]) {
+			moveUpdate: function(oldplace, newplace, chr, clr) {
 				this.shadowRoot.getElementById(oldplace).innerHTML = this.space;
 				this.shadowRoot.getElementById(newplace).innerHTML = chr;
 				this.shadowRoot.getElementById(newplace).style.color = clr;
-				// this.fire('data-change',);
+				this.fire('data-change');
+				// if (this.user == null) {
+				// 	console.log("you are not yet in the room");
+				// } else {
+				// 	if (this.userState) {
+				// 		var place = this.userState.file + this.userState.rank;
+				// 		console.log("your position is " + place);
+				// 		var filenum = this.files.indexOf(this.userState.file)
+				// 		this.newfiledown = filenum;
+				// 		this.newfiledown++;
+				// 		this.newfileup = filenum;
+				// 		this.newfileup--;
+				// 		this.newrankleft = this.userState.rank;
+				// 		this.newrankleft--;
+				// 		this.newrankright = this.userState.rank;
+				// 		this.newrankright++;
+				// 	}
+				// }
 			},
 
 			// occupiedChanged: function(){
@@ -492,16 +521,16 @@
 				}
 			},
 
-			childChanged: function(e) {
-				if (this.debug) { console.log("function childChanged: " + e); }
-				var chr = e.detail.value.chr;
-				var clr = e.detail.value.clr;
-				var oldplace = e.detail.value.lastknownplace;
-				this.occupied.splice(this.occupied.indexOf(oldplace), 1);
-				var newplace = e.detail.value.file + e.detail.value.rank;
-				this.occupied.push(newplace);
-				this.moveUpdate(oldplace,newplace,chr,clr);
-			},			
+			// childChanged: function(e) {
+			// 	if (this.debug) { console.log("function childChanged: " + e); }
+			// 	var chr = e.detail.value.chr;
+			// 	var clr = e.detail.value.clr;
+			// 	var oldplace = e.detail.value.lastknownplace;
+			// 	this.occupied.splice(this.occupied.indexOf(oldplace), 1);
+			// 	var newplace = e.detail.value.file + e.detail.value.rank;
+			// 	this.occupied.push(newplace);
+			// 	this.moveUpdate(oldplace,newplace,chr,clr);
+			// },			
 
 			noCollision: function(newplace) {
 				if (!this.occupied.hasOwnProperty(newplace)) {

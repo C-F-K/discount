@@ -45,15 +45,17 @@ io.sockets.on('connection', function(socket){
 	});
 
 	socket.on('userMoved', function(payload){
-		// var mid = payload.id;
-		// population[mid] = payload;
-		// var lkp = payload.lastknownplace
-		// delete occupiedSpaces[lkp]
-		// var newSpace = payload.file + payload.rank;
-		// occupiedSpaces[newSpace] = mid;
-		// var movedChr = population[mid].chr;
-		// var movedClr = population[mid].clr;
-		// var resPayload = [lkp, newSpace, movedChr, movedClr];
+		var mid = payload[0];
+		var newplace = payload[1];
+		population[mid].lastknownplace = population[mid].file + population[mid].rank;
+		// console.log('lkp')
+		// console.log(population[mid].lastknownplace);
+		population[mid].file = newplace.substring(0,1);
+		population[mid].rank = newplace.substring(1);
+		var oldplace = population[mid].lastknownplace;
+		delete occupiedSpaces[oldplace];
+		occupiedSpaces[newplace] = mid; 
+		var resPayload = [mid, oldplace, newplace];
 		io.sockets.emit('movedUser', resPayload);
 	});
 
