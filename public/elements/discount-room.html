@@ -81,36 +81,36 @@
 				display: block;
 			} 
 		</style>
-			<div id="userconfig">
-				<label>Name:</label> 
-				<input id="uname" type="text"></input><br>
-				<label>Character:</label>
-				<div id="charblock">
-					<template repeat="{{ char in characters }}">
-						<span id="{{char.name}}" class="possiblechar" on-click={{clickChar}}>{{char.chr}}</span>
-					</template>
-				</div><br>
-				<label>Color:</label>
-				<div id="colorblock">
-					<template repeat="{{ color in palette }}">
-						<div class="singlecolor" id="{{color}}" on-click={{fadeOthers}}></div>
-					</template>
-				</div>
-				<br>
-				<div id="buttoncontainer">
-					<button id="submit" on-click={{sendChar}}>Submit</button>
-				</div>
+		<div id="userconfig">
+			<label>Name:</label> 
+			<input id="uname" type="text"></input><br>
+			<label>Character:</label>
+			<div id="charblock">
+				<template repeat="{{ char in characters }}">
+					<span id="{{char.name}}" class="possiblechar" on-click={{clickChar}}>{{char.chr}}</span>
+				</template>
+			</div><br>
+			<label>Color:</label>
+			<div id="colorblock">
+				<template repeat="{{ color in palette }}">
+					<div class="singlecolor" id="{{color}}" on-click={{fadeOthers}}></div>
+				</template>
 			</div>
-			<hr>
-			<table> 
-	        	<template repeat="{{ file in files }}">
-	        	    <tr>
-	        	        <template repeat="{{ rank in ranks }}">
-	        	            <td id="{{file}}{{rank}}">{{ space }}</td>
-	        	        </template>
-	    	        </tr>
-	    	    </template>
-		    </table>
+			<br>
+			<div id="buttoncontainer">
+				<button id="submit" on-click={{sendChar}}>Submit</button>
+			</div>
+		</div>
+		<hr>
+		<table> 
+			<template repeat="{{ file in files }}">
+				<tr>
+					<template repeat="{{ rank in ranks }}">
+						<td id="{{file}}{{rank}}">{{ space }}</td>
+					</template>
+				</tr>
+			</template>
+		</table>
 	</template>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>

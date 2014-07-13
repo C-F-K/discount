@@ -1,45 +1,44 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>disCount - a discursive encounter</title>
-    <link rel="stylesheet" href="./public/styles.css">
-    <script src="../bower_components/platform/platform.js"></script>
-    <link rel="import" href="./elements/spoiler-alert.html">
-    <link rel="import" href="./elements/discount-room.html">
-    <script type="text/javascript" src="./vendor/firebase.js"></script>
-    <style>
-      :unresolved {
-        opacity: 0;
-      }
-    </style>
-  </head>
-  </head>
-  <body>
-    <h1>disCount</h1>
-    <h2>a discursive encounter</h2>
-    <br>
-    <!-- <spoiler-alert>Ned Stark dies</spoiler-alert> -->
-    <discount-room id="room"></discount-room>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      document.addEventListener('polymer-ready', function(){
-        var socket = io();
-        var room = document.querySelector('#room');
-        socket.on('uuid', function(e){
-          room.user = e.uuid;
-        });
-        socket.on('newCharAdded', function(payload){
-          room.fire('new-char', payload);
-        });
-        socket.on('userLeaving', function(payload){
-          room.fire('user-left', payload);
-        });
-        socket.on('movedUser', function(payload){
-          room.fire('moved-user', payload);
-        });
-      });
-    </script>
-  </body>
+	<head>
+		<meta charset="utf-8">
+		<title>disCount - a discursive encounter</title>
+		<link rel="stylesheet" href="./public/styles.css">
+		<script src="../bower_components/platform/platform.js"></script>
+		<link rel="import" href="./elements/spoiler-alert.html">
+		<link rel="import" href="./elements/discount-room.html">
+		<!-- <link rel="import" href="./elements/cfk-console.html"> -->
+		<style>
+			:unresolved {
+				opacity: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>disCount</h1>
+		<h2>a discursive encounter</h2>
+		<br>
+		<!-- <spoiler-alert>Ned Stark dies</spoiler-alert> -->
+		<discount-room id="room"></discount-room>
+		<!-- <cfk-console></cfk-console> -->
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			document.addEventListener('polymer-ready', function(){
+				var socket = io();
+				var room = document.querySelector('#room');
+				socket.on('uuid', function(e){
+					room.user = e.uuid;
+				});
+				socket.on('newCharAdded', function(payload){
+					room.fire('new-char', payload);
+				});
+				socket.on('userLeaving', function(payload){
+					room.fire('user-left', payload);
+				});
+				socket.on('movedUser', function(payload){
+					room.fire('moved-user', payload);
+				});
+			});
+		</script>
+	</body>
 </html>
