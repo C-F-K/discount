@@ -7,6 +7,8 @@ chat:
 	/slash commands interpreted as such, etc
 	console:
 		input at the bottom, display to the right?
+	console + output should be separate element declared inside 'room'
+		'room' will need an attribute and handler to receive and act on input from console
 
 combat:
 	do on nocollision = false
@@ -15,4 +17,14 @@ combat:
 		userState = {bunch of properties: bunch of values, attributes: {more stuff}}
 		perhaps so, to make sure that is the only level the user gets to fuck with
 	hp and ac at least?
-	make it a roguelike
+	make it roguelike
+	reproduce standard NH attributes or simplified DF versions
+		make their values random
+		make them invisible to others, of course
+
+later:
+	add support for walls
+		single wall entity that detects other walls beside it and displays the appropriate character
+		will require supporting code page 437
+			this in turn might require (or make sensible) refactoring to use codepoint values for all displayed characters
+		LOGO style drawing - user inputs command to raise and lower wall-drawing "pen". command "/turtle"?

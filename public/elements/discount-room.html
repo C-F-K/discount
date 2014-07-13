@@ -2,19 +2,38 @@
 
 <polymer-element 	name="discount-room" 
 					on-new-char="{{ newCharHandler }}"
-					on-user-left="{{ userExitHandler }}"
 					on-moved-user="{{ movedUserHandler }}"
-					on-data-change="{{ dataChange }}">
+					on-data-change="{{ dataChange }}"
+					on-user-left="{{ userExitHandler }}">
 	<template>
 		<style type="text/css">
-			#userconfig {
-				display: block;
-			} 
+			/* Elements */
 
-			label { 
-			    display: inline-block; 
-			    width: 8.75em; 
-			    text-align: right; 
+			label {
+				display: inline-block;
+				text-align: right;
+				width: 8.75em;
+			}
+
+			table {
+				font-size: 8pt;
+				height:100%;
+				padding-left: auto;
+				padding-right: auto;
+				width:100%;
+			}
+
+			td {
+				height: 2.2em;
+				text-align: center;
+				vertical-align: bottom;	
+				width: 1.25%;
+			}
+
+			/* Classes */
+
+			.possiblechar {
+				border: 1px solid black;
 			}
 
 			.selected {
@@ -22,32 +41,18 @@
 			}
 
 			.singlecolor {
+				display: inline-block;
+				height: 24px;
+				margin-right: 6px;
+				opacity: 0.9;
 				transition: opacity 1s;
 				-webkit-transition: opacity 1s;
 				-moz-transition: opacity 1s;
 				-o-transition: opacity 1s;
-				opacity: 0.9;
-				height: 24px;
 				width: 24px;
-				display: inline-block;
-				margin-right: 6px;
-			}
-			#submit {
-				display:inline-block;
 			}
 
-			#charblock {
-				display:inline-block;
-				width: 32em;
-				vertical-align: text-top;
-				padding-bottom:6px;
-			}
-
-			#colorblock {
-				display:inline-block;
-				width: 32em;
-				vertical-align: text-top;
-			}
+			/* IDs */
 
 			#buttoncontainer {
 				display:inline-block;
@@ -55,32 +60,27 @@
 				margin-top: 0.5em;
 			}
 
-			table {
-			    font-size: 8pt;
-			    width:100%;
-			    height:100%;
-			    padding-left: auto;
-			    padding-right: auto;
+			#charblock {
+				display:inline-block;
+				padding-bottom:6px;
+				vertical-align: text-top;
+				width: 32em;
 			}
 
-			td {
-			    width: 1.25%;
-			    height: 2.2em;
-			    text-align: center;
-			    vertical-align: bottom;	
+			#colorblock {
+				display:inline-block;
+				vertical-align: text-top;
+				width: 32em;
 			}
+
+			#submit {
+				display:inline-block;
+			}
+
+			#userconfig {
+				display: block;
+			} 
 		</style>
-			<!-- <firebase-element 	id="firebase" 
-								location="https://discount-app.firebaseio.com/" 
-								data="{{data}}" 
-								keys="{{keys}}"
-								log
-								childEvents
-								on-data-change={{dataChange}}
-								on-child-added={{childAdded}}
-								on-child-changed={{childChanged}}
-								on-child-removed={{childRemoved}}>
-			</firebase-element> -->
 			<div id="userconfig">
 				<label>Name:</label> 
 				<input id="uname" type="text"></input><br>
@@ -121,9 +121,6 @@
 				user: null
 			},
 			readyFlag: 0,
-			debug: 0,
-			observe: {
-			},
 			characters: [
 				{name:"a", chr:"a"}, 
 				{name:"b", chr:"b"}, 
