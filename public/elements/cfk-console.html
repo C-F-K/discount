@@ -2,14 +2,66 @@
 
 <polymer-element name="cfk-console">
 	<template>
-		<style>
+		<style type="text/css">
+
+			input:focus{
+				outline: 0;
+			}
+
+			#form { 
+				padding-left: 3px; 
+				padding-right: 3px;
+				width: 99%;
+			}
+			#form input { 
+				background: black; 
+				color: white; 
+				border: 0px; 
+				width: 100%; 
+			}
+
+			#messages { 
+				height: 7em; 
+				margin: 0px; 
+				padding: 0px; 
+				overflow: auto;
+			}
 
 		</style>
-		
-	</template>
-	<script>
-		Polymer('cfk-console',{
 
+		<div id="cmdcontain">
+			<hr>
+			<div id="messages">
+			</div>
+			<hr>
+			<div id="form">
+				<input id="m" autocomplete="off"/>
+			</div>
+		</div>
+	</template>
+
+	<script>
+		Polymer('cfk-console', {
+			ready: function(){
+				var boundOnKeyUp = this.onKeyUp.bind(this);
+				window.addEventListener("keyup", boundOnKeyUp, false);
+			},
+
+			onKeyUp: function(evt){
+				if (evt = evt ? evt : window.event ? event : null) {
+					if (this[evt.keyCode]) {
+						this[evt.keyCode](evt);
+					}
+				}
+			},
+
+			'13': function(){
+				if (this.$.m.value != "") {
+					this.$.messages.innerHTML = this.$.messages.innerHTML + '<span>' + this.$.m.value + '</span><br>';
+					this.$.messages.scrollTop = this.$.messages.scrollHeight;
+					this.$.m.value = "";
+				}
+			}
 		});
 	</script>
 </polymer-element>

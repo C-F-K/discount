@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<meta charset="utf-8">
+		<!-- <meta http-equiv="content-type" content="text/html"> -->
 		<title>disCount - a discursive encounter</title>
 		<link rel="stylesheet" href="./public/styles.css">
 		<script src="../bower_components/platform/platform.js"></script>
 		<link rel="import" href="./elements/spoiler-alert.html">
 		<link rel="import" href="./elements/discount-room.html">
-		<!-- <link rel="import" href="./elements/cfk-console.html"> -->
 		<style>
 			:unresolved {
 				opacity: 0;
@@ -15,12 +15,8 @@
 		</style>
 	</head>
 	<body>
-		<h1>disCount</h1>
-		<h2>a discursive encounter</h2>
-		<br>
 		<!-- <spoiler-alert>Ned Stark dies</spoiler-alert> -->
 		<discount-room id="room"></discount-room>
-		<!-- <cfk-console></cfk-console> -->
 		<script src="/socket.io/socket.io.js"></script>
 		<script>
 			document.addEventListener('polymer-ready', function(){
@@ -32,12 +28,13 @@
 				socket.on('newCharAdded', function(payload){
 					room.fire('new-char', payload);
 				});
-				socket.on('userLeaving', function(payload){
-					room.fire('user-left', payload);
-				});
 				socket.on('movedUser', function(payload){
 					room.fire('moved-user', payload);
 				});
+				socket.on('userLeaving', function(payload){
+					room.fire('user-left', payload);
+				});
+
 			});
 		</script>
 	</body>
