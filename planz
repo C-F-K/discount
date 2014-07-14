@@ -5,8 +5,6 @@ goal:
 chat:
 	talking is default behavior of entering text into console
 	/slash commands interpreted as such, etc
-	console:
-		input at the bottom, display to the right?
 	console + output should be separate element declared inside 'room'
 		'room' will need an attribute and handler to receive and act on input from console
 
@@ -28,3 +26,11 @@ later:
 		will require supporting code page 437
 			this in turn might require (or make sensible) refactoring to use codepoint values for all displayed characters
 		LOGO style drawing - user inputs command to raise and lower wall-drawing "pen". command "/turtle"?
+			single lines: permeable/cosmetic
+			double lines: collision-positive
+			and if we're going that far, why not doors with settable attributes too
+				such that a user's attributes object has to contain the correct key to allow passage
+		DF-style 'zone/room' designating?
+			always centered on character
+			not sure what the added value would be however - discursive 'spaces' already modeled with walls/doors
+			though actually drawing a space is somewhat more elegant

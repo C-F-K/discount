@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<polymer-element name="cfk-console">
+<polymer-element 	name="cfk-console">
 	<template>
 		<style type="text/css">
 
@@ -42,6 +42,11 @@
 
 	<script>
 		Polymer('cfk-console', {
+			publish: {
+				output: null,
+				input: null
+			},
+
 			ready: function(){
 				var boundOnKeyUp = this.onKeyUp.bind(this);
 				window.addEventListener("keyup", boundOnKeyUp, false);
@@ -61,6 +66,10 @@
 					this.$.messages.scrollTop = this.$.messages.scrollHeight;
 					this.$.m.value = "";
 				}
+			},
+
+			inputChanged: function(){
+				
 			}
 		});
 	</script>

@@ -138,7 +138,10 @@
 				</tr>
 			</template>
 		</table>
-		<cfk-console id="cmd"></cfk-console>
+		<cfk-console 	id="cmd" 
+						output="{{ consoleOutput }}" 
+						input="{{ consoleInput }}">
+		</cfk-console>
 	</template>
 
 	<script src="/socket.io/socket.io.js"></script>
@@ -598,6 +601,10 @@
 				delete this.occupied[place];
 				this.shadowRoot.getElementById(place).innerHTML = this.space;
 				console.log("user " + lnm + " has left the room");
+			},
+
+			consoleOutputChanged: function(){
+
 			}
 		});		
 	</script>
