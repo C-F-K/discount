@@ -5,6 +5,7 @@
 					on-new-char="{{ newCharHandler }}"
 					on-moved-user="{{ movedUserHandler }}"
 					on-data-change="{{ dataChange }}"
+					on-console-msg="{{ consoleMessageHandler }}"
 					on-user-left="{{ userExitHandler }}">
 	<template>
 		<style type="text/css">
@@ -593,7 +594,16 @@
 						this.newrankright++;
 					}
 				}
-			},			
+			},	
+			
+			consoleMessageHandler: function(payload){
+				this.consoleInput = payload;
+			},	
+			
+			consoleOutputChanged: function(){
+				var consolePayload = [this.userState.id, this.consoleOutput];
+				socket.emit('consoleCommand', consolePayload);
+			},
 
 			userExitHandler: function(payload){
 				var place = payload.detail;
@@ -601,11 +611,9 @@
 				delete this.occupied[place];
 				this.shadowRoot.getElementById(place).innerHTML = this.space;
 				console.log("user " + lnm + " has left the room");
-			},
-
-			consoleOutputChanged: function(){
-
 			}
+
+			
 		});		
 	</script>
 </polymer-element>

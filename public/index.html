@@ -31,6 +31,9 @@
 				socket.on('movedUser', function(payload){
 					room.fire('moved-user', payload);
 				});
+				socket.on('consoleMsg', function(payload){
+					room.fire('console-msg', payload);
+				});
 				socket.on('userLeaving', function(payload){
 					room.fire('user-left', payload);
 				});

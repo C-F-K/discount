@@ -58,6 +58,14 @@ io.sockets.on('connection', function(socket){
 		var resPayload = [mid, oldplace, newplace];
 		io.sockets.emit('movedUser', resPayload);
 	});
+	
+	socket.on('consoleCommand', function(payload){
+		var cid = payload[0];
+		var ccmd = payload[1];
+		var resString = cid + ": " + ccmd;
+		io.sockets.emit('consoleMsg', resString);
+		// if logging: add code here to add string to log
+	});
 
 	socket.on('requestCharData', function(payload){
 
