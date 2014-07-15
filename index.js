@@ -17,12 +17,12 @@ var population = new Object();
 var occupiedSpaces = new Object();
 
 io.sockets.on('connection', function(socket){
-	console.log('a user connected');
+	// console.log('a user connected');
 	var userId = socket.id;
 	var newUser = { 'uuid' : userId };
 	socket.emit('uuid', newUser);
 	population[userId] = new Object();
-	console.log(population);
+	// console.log(population);
 	socket.on('newChar', function(e){
 
 		population[userId] = {
@@ -37,10 +37,10 @@ io.sockets.on('connection', function(socket){
 
 		var newSpace = e.file + e.rank;
 		occupiedSpaces[newSpace] = userId;
-		console.log('occupied:');
-		console.log(occupiedSpaces);
-		console.log('user has specified char:');
-		console.log(population[userId]);
+		// console.log('occupied:');
+		// console.log(occupiedSpaces);
+		// console.log('user has specified char:');
+		// console.log(population[userId]);
 		io.sockets.emit('newCharAdded', occupiedSpaces);
 	});
 
@@ -62,7 +62,8 @@ io.sockets.on('connection', function(socket){
 	socket.on('consoleCommand', function(payload){
 		var cid = payload[0];
 		var ccmd = payload[1];
-		var resString = cid + ": " + ccmd;
+		var cnm = population[cid].nm;
+		var resString = cnm + ": " + ccmd;
 		io.sockets.emit('consoleMsg', resString);
 		// if logging: add code here to add string to log
 	});

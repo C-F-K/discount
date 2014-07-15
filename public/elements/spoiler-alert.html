@@ -25,29 +25,35 @@
 				text-align: center;
 				margin: inherit;
 			}
-		</style>
+			</style>
+			
 		<div id="spoilercontainer">
 			<span id="spoilers">
 				<content></content>
 			</span>
 		</div>
-		<button on-click={{toggleHide}}>{{buttonText}}</button>
+		<button on-click={{toggleHide}}>{{buttonText}}</button>	
 	</template>
+	
 	<script>
 		Polymer('spoiler-alert', {
 			hide: 1,
-			buttonText: "Here be spoilers",
+			publish: {
+				warning: "Here be spoilers",
+				undo: "ACK! Cannot unsee!"
+			},
+			buttonText: this.warning,
 			ready: function() {
 				this.$.spoilers.style.opacity = 0;
 			},
 			toggleHide: function() {
 				if (this.hide) {
 					this.$.spoilers.style.opacity = 1;
-					this.buttonText = "ACK! Cannot unsee!"
+					this.buttonText = this.undo;
 					this.hide = 0;
 				} else {
 					this.$.spoilers.style.opacity = 0;
-					this.buttonText = "Here be spoilers";
+					this.buttonText = this.warning;
 					this.hide = 1;
 				}
 			}
