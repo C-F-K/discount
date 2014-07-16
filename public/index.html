@@ -34,6 +34,9 @@
 				socket.on('consoleMsg', function(payload){
 					room.fire('console-msg', payload);
 				});
+				socket.on('consoleReturn', function(payload){
+					room.fire('console-return', payload);
+				});
 				socket.on('userLeaving', function(payload){
 					room.fire('user-left', payload);
 				});

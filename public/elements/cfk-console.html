@@ -68,10 +68,14 @@
 			},
 
 			inputChanged: function(){
-				var msgs = this.$.messages;
-				msgs.innerHTML = msgs.innerHTML + '<span>' + this.input + '</span><br>';
-				msgs.scrollTop = msgs.scrollHeight;
+				if (this.input != null) {					
+					var msgs = this.$.messages;
+					msgs.innerHTML = msgs.innerHTML + '<span>' + this.input + '</span><br>';
+					msgs.scrollTop = msgs.scrollHeight;
+					this.input = null;
+				}
 			}
+			
 		});
 	</script>
 </polymer-element>

@@ -1,14 +1,17 @@
 goal: 
-	chat
+	chat DONE
 	combat
-	refactor to display name where relevant, rather than id
-		including "you bump into <name>" on collision
+	refactor to display name where relevant, rather than id DONE
+		including "you bump into <name>" on collision DONE
 
 chat:
-	talking is default behavior of entering text into console
-	/slash commands interpreted as such, etc
-	console + output should be separate element declared inside 'room'
-		'room' will need an attribute and handler to receive and act on input from console
+	talking is default behavior of entering text into console DONE
+	/slash commands interpreted as such, etc DONE.... I THINK?
+		list of needed slash commands:
+			/me DONE
+			?
+	console + output should be separate element declared inside 'room' YA OBVS 
+		'room' will need an attribute and handler to receive and act on input from console NOT QUITE, BUT DONE
 
 combat:
 	do on nocollision = false
@@ -44,3 +47,6 @@ if (string.substring(0,1) == "/"){
 		handlerObj.fuck(); // POJO like the keyhandlers
 	}
 }
+
+note: evt.target.shadowRoot.activeElement.id 
+what a clusterfuck but jaysus it works
