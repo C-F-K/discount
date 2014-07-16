@@ -1,8 +1,9 @@
 goal: 
 	chat DONE
 	combat
-	refactor to display name where relevant, rather than id NOT QUITE DONE
+	refactor to display name where relevant, rather than id DONE
 		including "you bump into <name>" on collision DONE
+	add list + checker for unique name?
 
 chat:
 	talking is default behavior of entering text into console DONE

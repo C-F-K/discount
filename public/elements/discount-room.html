@@ -2,6 +2,7 @@
 <link rel="import" href="./cfk-console.html">
 
 <polymer-element 	name="discount-room" 
+					on-pre-pop="{{ prePopulate }}"
 					on-new-char="{{ newCharHandler }}"
 					on-moved-user="{{ movedUserHandler }}"
 					on-data-change="{{ dataChange }}"
@@ -314,6 +315,10 @@
 				this.readyFlag = 1;
 			},
 
+			prePopulate: function(payload){
+				this.newCharHandler(payload);
+			},
+
 			styleColorDivs: function(){
 				var queryRoot = this.shadowRoot;
 				var resource = this.palette;
@@ -418,7 +423,7 @@
 			newCharHandler: function(payload){
 				var list = payload.detail;
 				for (var coords in list) {
-					if (list[coords] == this.user) {
+					if (list[coords].id == this.user) {
 						if (!this.occupied.hasOwnProperty(coords)) {
 							var newNode = this.shadowRoot.getElementById(coords);
 							var lchr = this.userState.chr;
@@ -426,11 +431,12 @@
 							newNode.innerHTML = lchr;
 							newNode.style.color = lclr;
 							this.occupied[coords] = {
-								nm: list[coords],
+								id: list[coords].id,
+								nm: list[coords].nm,
 								chr: lchr,
 								clr: lclr
 							};
-							console.log("user " + list[coords] + " has entered the room at " + coords);
+							this.consoleInput = "User " + list[coords].nm + " has entered the room at " + coords;
 						}
 					} else {
 						if (!this.occupied.hasOwnProperty(coords)) {
@@ -440,11 +446,12 @@
 							newNode.innerHTML = rchr;
 							newNode.style.color = rclr;
 							this.occupied[coords] = {
-								nm: list[coords],
+								id: list[coords].id,
+								nm: list[coords].nm,
 								chr: rchr,
 								clr: rclr
 							};
-							console.log("user " + list[coords] + " has entered the room at " + coords);
+							this.consoleInput = "User " + list[coords].nm + " has entered the room at " + coords;
 						}
 					}			
 				}
@@ -482,6 +489,7 @@
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
 				} else {
+					// console.log(this.occupied[newplace]);
 					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
 				}
 			},
@@ -500,6 +508,7 @@
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
 				} else {
+					// console.log(this.occupied[newplace]);
 					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
 				}
 			},
@@ -518,6 +527,7 @@
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
 				} else {
+					// console.log(this.occupied[newplace]);
 					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
 				}
 			},
@@ -536,6 +546,7 @@
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
 				} else {
+					// console.log(this.occupied[newplace]);
 					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
 				}
 			},
@@ -569,7 +580,7 @@
 				var oldplace = res[1];
 				var newplace = res[2];
 				var newcoords = this.occupied[oldplace];
-				if (newcoords.nm == mid) {
+				if (newcoords.id == mid) {
 					var mchr = newcoords.chr;
 					var mclr = newcoords.clr;
 					delete this.occupied[oldplace];

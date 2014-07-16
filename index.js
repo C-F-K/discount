@@ -31,7 +31,8 @@ io.sockets.on('connection', function(socket){
 	var newUser = { 'uuid' : userId };
 	socket.emit('uuid', newUser);
 	population[userId] = new Object();
-	// console.log(population);
+	socket.emit('prepopulate', occupiedSpaces);
+
 	socket.on('newChar', function(e){
 
 		population[userId] = {
@@ -45,7 +46,7 @@ io.sockets.on('connection', function(socket){
 		};
 
 		var newSpace = e.file + e.rank;
-		occupiedSpaces[newSpace] = userId;
+		occupiedSpaces[newSpace] = {id: userId, nm: population[userId].nm};
 		// console.log('occupied:');
 		// console.log(occupiedSpaces);
 		// console.log('user has specified char:');
@@ -63,7 +64,7 @@ io.sockets.on('connection', function(socket){
 		population[mid].rank = newplace.substring(1);
 		var oldplace = population[mid].lastknownplace;
 		delete occupiedSpaces[oldplace];
-		occupiedSpaces[newplace] = mid; 
+		occupiedSpaces[newplace] = population[mid].nm; 
 		var resPayload = [mid, oldplace, newplace];
 		io.sockets.emit('movedUser', resPayload);
 	});

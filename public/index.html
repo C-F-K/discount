@@ -25,6 +25,9 @@
 				socket.on('uuid', function(e){
 					room.user = e.uuid;
 				});
+				socket.on('prepopulate', function(payload){
+					room.fire('pre-pop', payload);
+				});
 				socket.on('newCharAdded', function(payload){
 					room.fire('new-char', payload);
 				});
