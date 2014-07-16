@@ -15,7 +15,7 @@
 		</style>
 	</head>
 	<body>
-		<!-- <spoiler-alert>Ned Stark dies</spoiler-alert> -->
+		<!-- <spoiler-alert undo="fuck">Ned Stark dies</spoiler-alert> -->
 		<discount-room id="room"></discount-room>
 		<script src="/socket.io/socket.io.js"></script>
 		<script>
@@ -30,6 +30,12 @@
 				});
 				socket.on('movedUser', function(payload){
 					room.fire('moved-user', payload);
+				});
+				socket.on('consoleMsg', function(payload){
+					room.fire('console-msg', payload);
+				});
+				socket.on('consoleReturn', function(payload){
+					room.fire('console-return', payload);
 				});
 				socket.on('userLeaving', function(payload){
 					room.fire('user-left', payload);

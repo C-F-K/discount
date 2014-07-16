@@ -1,12 +1,17 @@
 goal: 
-	chat
+	chat DONE
 	combat
+	refactor to display name where relevant, rather than id NOT QUITE DONE
+		including "you bump into <name>" on collision DONE
 
 chat:
-	talking is default behavior of entering text into console
-	/slash commands interpreted as such, etc
-	console + output should be separate element declared inside 'room'
-		'room' will need an attribute and handler to receive and act on input from console
+	talking is default behavior of entering text into console DONE
+	/slash commands interpreted as such, etc DONE.... I THINK?
+		list of needed slash commands:
+			/me DONE
+			?
+	console + output should be separate element declared inside 'room' YA OBVS 
+		'room' will need an attribute and handler to receive and act on input from console NOT QUITE, BUT DONE
 
 combat:
 	do on nocollision = false
@@ -34,3 +39,14 @@ later:
 			always centered on character
 			not sure what the added value would be however - discursive 'spaces' already modeled with walls/doors
 			though actually drawing a space is somewhat more elegant
+			
+parsing console string for slash command:
+if (string.substring(0,1) == "/"){ 
+	var fuck = string.substring(1,string.indexOf(" ")); // between the slash and the first space
+	if (handlerObj.fuck) {
+		handlerObj.fuck(); // POJO like the keyhandlers
+	}
+}
+
+note: evt.target.shadowRoot.activeElement.id 
+what a clusterfuck but jaysus it works

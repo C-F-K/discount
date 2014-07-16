@@ -5,6 +5,8 @@
 					on-new-char="{{ newCharHandler }}"
 					on-moved-user="{{ movedUserHandler }}"
 					on-data-change="{{ dataChange }}"
+					on-console-msg="{{ consoleMessageHandler }}"
+					on-console-return="{{ consoleReturnHandler }}"
 					on-user-left="{{ userExitHandler }}">
 	<template>
 		<style type="text/css">
@@ -479,6 +481,8 @@
 					this.userState.rank = this.newrankleft;
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
+				} else {
+					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
 				}
 			},
 			'38': function(evt){
@@ -495,6 +499,8 @@
 					this.userState.file = this.files[this.newfileup];
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
+				} else {
+					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
 				}
 			},
 			'39': function(evt){
@@ -511,6 +517,8 @@
 					this.userState.rank = this.newrankright;
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
+				} else {
+					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
 				}
 			},
 			'40': function(evt){
@@ -527,6 +535,8 @@
 					this.userState.file = this.files[this.newfiledown];
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
+				} else {
+					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
 				}
 			},
 			'192': function(evt){
@@ -593,7 +603,41 @@
 						this.newrankright++;
 					}
 				}
-			},			
+			},	
+			
+			consoleMessageHandler: function(payload){
+				this.consoleInput = payload.detail;
+			},	
+
+			consoleReturnHandler: function(payload){
+				var returned = payload.detail;
+				var func = returned.shift();
+				var prm = returned[0];
+				if (this[func]) {
+					this[func](prm);
+				}
+			},
+			'me': function(prm){
+				this.consoleInput = prm;
+			},
+			
+			consoleOutputChanged: function(){
+				if (this.consoleOutput != null) {
+					if (this.consoleOutput.substring(0,1) === "/") {
+						var cmd = (this.consoleOutput.indexOf(" ") === -1) ? this.consoleOutput.substring(1) : this.consoleOutput.substring(1,this.consoleOutput.indexOf(" "));
+						if (this.consoleOutput.indexOf(" ") != -1) {
+							var prm = this.consoleOutput.substring(this.consoleOutput.indexOf(" ") + 1);
+						}
+						var consolePayload = (prm) ? [this.userState.id, prm, cmd] : [this.userState.id, cmd];
+						socket.emit('consoleCommand', consolePayload);
+						this.consoleOutput = null;
+					} else {
+						var consolePayload = [this.userState.id, this.consoleOutput];
+						socket.emit('consoleMessage', consolePayload);
+						this.consoleOutput = null;
+					}
+				}
+			},
 
 			userExitHandler: function(payload){
 				var place = payload.detail;
@@ -601,11 +645,8 @@
 				delete this.occupied[place];
 				this.shadowRoot.getElementById(place).innerHTML = this.space;
 				console.log("user " + lnm + " has left the room");
-			},
-
-			consoleOutputChanged: function(){
-
 			}
+
 		});		
 	</script>
 </polymer-element>

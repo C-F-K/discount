@@ -62,15 +62,20 @@
 
 			'13': function(){
 				if (this.$.m.value != "") {
-					this.$.messages.innerHTML = this.$.messages.innerHTML + '<span>' + this.$.m.value + '</span><br>';
-					this.$.messages.scrollTop = this.$.messages.scrollHeight;
+					this.output = this.$.m.value;
 					this.$.m.value = "";
 				}
 			},
 
 			inputChanged: function(){
-				
+				if (this.input != null) {					
+					var msgs = this.$.messages;
+					msgs.innerHTML = msgs.innerHTML + '<span>' + this.input + '</span><br>';
+					msgs.scrollTop = msgs.scrollHeight;
+					this.input = null;
+				}
 			}
+			
 		});
 	</script>
 </polymer-element>
