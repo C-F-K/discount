@@ -3,7 +3,10 @@ goal:
 	combat
 	refactor to display name where relevant, rather than id DONE
 		including "you bump into <name>" on collision DONE
-	add list + checker for unique name?
+	add list + checker for unique name? PROBABLY NOT
+	what happens when two users enter the same space at the same time
+	/me + " " returns "user undefined", fix that
+
 
 chat:
 	talking is default behavior of entering text into console DONE
@@ -48,6 +51,8 @@ if (string.substring(0,1) == "/"){
 		handlerObj.fuck(); // POJO like the keyhandlers
 	}
 }
+
+seriously what the hell
 
 note: evt.target.shadowRoot.activeElement.id 
 what a clusterfuck but jaysus it works
