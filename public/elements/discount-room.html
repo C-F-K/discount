@@ -346,11 +346,36 @@
 				this.$.userconfig.style.display="block";
 			},
 
+			browserCheck: function(evt) {
+				if (evt.toElement) {
+					return "chrome";
+				} else if (evt.impl.target) {
+					return "firefox";
+				} else {
+					alert("Get a real browser");
+					return false;
+				}
+			},
+
 			clickChar: function(el) {
-				if (el.toElement.className == "possiblechar selected") {
+				var browser = this.browserCheck(el);
+				if (browser === "chrome") {
+					var meantClass = el.toElement.className;
+				} else if (browser === "firefox") {
+					var meantClass = el.impl.target.className;
+				} else {
+					return false;
+				}
+				if (meantClass == "possiblechar selected") {
 					return false;
 				} else {
-					var clickedId = "#" + el.toElement.id;
+					if (browser === "chrome") {
+						var clickedId = "#" + el.toElement.id;
+					} else if (browser === "firefox") {
+						var clickedId = "#" + el.impl.target.id;
+					} else {
+						return false;
+					}
 					var queried = this.shadowRoot;
 					var resource = this.characters;
 					var preselect = "";
@@ -375,8 +400,16 @@
 				for (var k = 0; k < this.palette.length; k++){
 					this.shadowRoot.getElementById(this.palette[k]).style.opacity=0.3;
 				}
-				this.shadowRoot.getElementById(e.toElement.id).style.opacity=1;
-				this.selectedColor = e.toElement.id;
+				var browser = this.browserCheck(e);
+				if (browser === "chrome") {
+					var meantId = e.toElement.id;
+				} else if (browser === "firefox") {
+					var meantId = e.impl.target.id;
+				} else {
+					return false;
+				}
+				this.shadowRoot.getElementById(meantId).style.opacity=1;
+				this.selectedColor = meantId;
 			},
 
 			sendChar: function(){
