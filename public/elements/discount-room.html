@@ -629,7 +629,15 @@
 				}
 			},
 			'me': function(prm){
-				this.consoleInput = prm;
+				var validatedParams = prm.match(/undefined/);
+				console.log(validatedParams);
+				var doubleValidatedParams = prm.substring(prm.indexOf(" "));
+				console.log(doubleValidatedParams);
+				var tripleValidatedParams = doubleValidatedParams.match(/\S/);
+				console.log(tripleValidatedParams);
+				if (validatedParams == null && tripleValidatedParams != null) {
+					this.consoleInput = prm;
+				}
 			},
 			
 			consoleOutputChanged: function(){

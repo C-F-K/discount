@@ -5,7 +5,7 @@ goal:
 		including "you bump into <name>" on collision DONE
 	add list + checker for unique name? PROBABLY NOT
 	what happens when two users enter the same space at the same time
-	/me + " " returns "user undefined", fix that
+	/me + " " returns "user undefined", fix that DONE WITH REGEXPS, FEAR ME
 
 
 chat:
