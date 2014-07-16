@@ -696,7 +696,7 @@
 				var lnm = this.occupied[place].nm;
 				delete this.occupied[place];
 				this.shadowRoot.getElementById(place).innerHTML = this.space;
-				console.log("user " + lnm + " has left the room");
+				this.consoleInput = "User " + lnm + " has left the room";
 			}
 
 		});		
