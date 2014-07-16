@@ -630,11 +630,11 @@
 			},
 			'me': function(prm){
 				var validatedParams = prm.match(/undefined/);
-				console.log(validatedParams);
+				// console.log(validatedParams);
 				var doubleValidatedParams = prm.substring(prm.indexOf(" "));
-				console.log(doubleValidatedParams);
+				// console.log(doubleValidatedParams);
 				var tripleValidatedParams = doubleValidatedParams.match(/\S/);
-				console.log(tripleValidatedParams);
+				// console.log(tripleValidatedParams);
 				if (validatedParams == null && tripleValidatedParams != null) {
 					this.consoleInput = prm;
 				}
