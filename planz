@@ -1,7 +1,7 @@
 goal: 
 	chat DONE
 	combat
-	refactor to display name where relevant, rather than id DONE
+	refactor to display name where relevant, rather than id NOT QUITE DONE
 		including "you bump into <name>" on collision DONE
 
 chat:

@@ -45,7 +45,7 @@ io.sockets.on('connection', function(socket){
 		};
 
 		var newSpace = e.file + e.rank;
-		occupiedSpaces[newSpace] = population[userId].nm;
+		occupiedSpaces[newSpace] = userId;
 		// console.log('occupied:');
 		// console.log(occupiedSpaces);
 		// console.log('user has specified char:');

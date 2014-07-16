@@ -482,7 +482,7 @@
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
 				} else {
-					this.consoleInput = "You bump into " + occupied[newplace].nm + ".";
+					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
 				}
 			},
 			'38': function(evt){
@@ -499,7 +499,9 @@
 					this.userState.file = this.files[this.newfileup];
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
-				} else {}
+				} else {
+					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
+				}
 			},
 			'39': function(evt){
 				if (evt.target.shadowRoot) {
@@ -515,7 +517,9 @@
 					this.userState.rank = this.newrankright;
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
-				} else {}
+				} else {
+					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
+				}
 			},
 			'40': function(evt){
 				if (evt.target.shadowRoot) {
@@ -531,7 +535,9 @@
 					this.userState.file = this.files[this.newfiledown];
 					var movePayload = [this.userState.id, newplace];
 					socket.emit('userMoved', movePayload);
-				} else {}
+				} else {
+					this.consoleInput = "You bump into " + this.occupied[newplace].nm + ".";
+				}
 			},
 			'192': function(evt){
 				if (evt.ctrlKey && evt.shiftKey) {
