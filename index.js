@@ -27,6 +27,7 @@ var commands = {
 
 io.sockets.on('connection', function(socket){
 	// console.log('a user connected');
+	// console.log(socket);
 	var userId = socket.id;
 	var newUser = { 'uuid' : userId };
 	socket.emit('uuid', newUser);

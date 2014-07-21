@@ -150,6 +150,28 @@
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
 		var socket = io();
+		var room = document.querySelector('#room');
+		socket.on('uuid', function(e){
+			room.user = e.uuid;
+		});
+		socket.on('prepopulate', function(payload){
+			room.fire('pre-pop', payload);
+		});
+		socket.on('newCharAdded', function(payload){
+			room.fire('new-char', payload);
+		});
+		socket.on('movedUser', function(payload){
+			room.fire('moved-user', payload);
+		});
+		socket.on('consoleMsg', function(payload){
+			room.fire('console-msg', payload);
+		});
+		socket.on('consoleReturn', function(payload){
+			room.fire('console-return', payload);
+		});
+		socket.on('userLeaving', function(payload){
+			room.fire('user-left', payload);
+		});
 
 		Polymer('discount-room', {
 			publish: {
