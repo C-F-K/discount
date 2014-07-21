@@ -110,12 +110,8 @@ io.sockets.on('connection', function(socket){
 });
 
 var server_port = app.get('port');
-// var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
+var server_ip_address = app.get('ipaddr');
 
-// http.listen(server_port, server_ip_address, function () {
-//   console.log( "Listening on " + server_ip_address + ", port " + server_port )
-// });
-
-http.listen(server_port, function () {
-  console.log( "Listening on port " + server_port )
+http.listen(server_port, server_ip_address, function () {
+  console.log( "Listening on " + server_ip_address + ", port " + server_port )
 });
