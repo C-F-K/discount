@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var url = require('url');
 var io = require('socket.io')(http);
 
-app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 8000);  
+app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 8080);  
 app.set('ipaddr', process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1");  
 
 app.use('/public', express.static(__dirname + '/public'));
