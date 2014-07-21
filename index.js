@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var url = require('url');
 var io = require('socket.io')(http);
 
-app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 3000);  
+app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 8000);  
 app.set('ipaddr', process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1");  
 
 app.use('/public', express.static(__dirname + '/public'));
@@ -109,9 +109,13 @@ io.sockets.on('connection', function(socket){
 	});
 });
 
-var server_port = process.env.OPENSHIFT_NODEJS_PORT || 3000
+var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8000
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
 
-http.listen(server_port, server_ip_address, function () {
+// http.listen(server_port, server_ip_address, function () {
+//   console.log( "Listening on " + server_ip_address + ", port " + server_port )
+// });
+
+http.listen(function () {
   console.log( "Listening on " + server_ip_address + ", port " + server_port )
 });
