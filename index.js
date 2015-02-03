@@ -107,7 +107,7 @@ io.sockets.on('connection', function(socket){
 	});
 });
 
-var port = Number(process.env.PORT || 5000);
+var port = Number(process.env.PORT || 8080);
 
 http.listen(port, function(){
 	console.log('listening on *:' + port);
